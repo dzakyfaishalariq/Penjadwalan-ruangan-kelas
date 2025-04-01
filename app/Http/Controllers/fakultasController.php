@@ -1,15 +1,33 @@
 <?php
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Services\fakultasService;
 
 class fakultasController extends Controller
 {
-    // Memanggil data fakultas dari poltekes kemenkes bengkulu di database
-    public function getFakultas(Request $request)
+    // membuat constructor untuk menampung variabel class services
+    public function __construct(fakultasService $fakultasService)
     {
-        $fakultas = DB::table('tb_fakultas')->get();
+        $this->fakultasService = $fakultasService;
+    }
+    // Memanggil data fakultas dari poltekes kemenkes bengkulu di database
+    public function getFakultas()
+    {
+        $fakultas = $this->fakultasService->getFakultas();
+
+        return response()->json($fakultas);
+    }
+    // Memanggil data fakultas berdasarkan id
+    public function getFakultasById($id)
+    {
+        $fakultas = $this->fakultasService->getFakultasById($id);
+
+        return response()->json($fakultas);
+    }
+    // Memanggil data fakultas berdasarkan name
+    public function getFakultasByName($name)
+    {
+        $fakultas = $this->fakultasService->getFakultasByName($name);
 
         return response()->json($fakultas);
     }

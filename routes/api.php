@@ -3,14 +3,9 @@
 use App\Http\Controllers\fakultasController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+// rute untuk memanggil semua data fakultas
 Route::middleware('api')->get('/fakultas', [fakultasController::class, 'getFakultas']);
+// rute untuk memanggil data fakultas berdasarkan id
+Route::middleware('api')->get('/fakultas/{id}', [fakultasController::class, 'getFakultasById']);
+// rute untuk memanggil data fakultas berdasarkan name fakultas
+Route::middleware('api')->get('/fakultas/name/{name?}', [fakultasController::class, 'getFakultasByName']);
