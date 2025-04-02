@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\fakultasService;
+use Illuminate\Http\Request;
 
 class fakultasController extends Controller
 {
@@ -28,6 +29,13 @@ class fakultasController extends Controller
     public function getFakultasByName($name)
     {
         $fakultas = $this->fakultasService->getFakultasByName($name);
+
+        return response()->json($fakultas);
+    }
+    // menambahkan data fakultas dengan validasi dan paramter inputan POST
+    public function createFakultas(Request $request)
+    {
+        $fakultas = $this->fakultasService->cretateFakultas($request);
 
         return response()->json($fakultas);
     }
