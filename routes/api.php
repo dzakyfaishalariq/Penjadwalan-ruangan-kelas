@@ -13,3 +13,5 @@ Route::middleware('api')->get('/fakultas/name/{name?}', [fakultasController::cla
 Route::middleware('api')->post('/fakultas/add', [fakultasController::class, 'createFakultas']);
 // rute untuk memperbarui data fakultas berdasarkan ID
 Route::middleware('api')->put('/fakultas/update/{id}', [fakultasController::class, 'updateFakultas']);
+// rute untuk menghapus data fakultas berdasarkan ID
+Route::middleware('api')->delete('/fakultas/delete/{id}', [fakultasController::class, 'deleteFakultas']);

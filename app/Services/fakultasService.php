@@ -84,4 +84,13 @@ class fakultasService
         ]);
 
     }
+    public function deleteFakultas($id)
+    {
+        // melakukan query builder untuk menghapus data fakultas
+        DB::table('tb_fakultas')->where('id', $id)->delete();
+        // mengembalikan response json berupa pesan fakultas berhasil di hapus
+        return response()->json([
+            'message' => 'Fakultas berhasil dihapus',
+        ]);
+    }
 }
