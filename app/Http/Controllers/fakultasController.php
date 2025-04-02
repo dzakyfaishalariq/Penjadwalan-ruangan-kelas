@@ -35,7 +35,15 @@ class fakultasController extends Controller
     // menambahkan data fakultas dengan validasi dan paramter inputan POST
     public function createFakultas(Request $request)
     {
-        $fakultas = $this->fakultasService->cretateFakultas($request);
+        $fakultas = $this->fakultasService->createFakultas($request);
+
+        return response()->json($fakultas);
+    }
+
+    // memperbarui data fakultas berdasarkan ID
+    public function updateFakultas(Request $request, $id)
+    {
+        $fakultas = $this->fakultasService->updateFakultas($request, $id);
 
         return response()->json($fakultas);
     }

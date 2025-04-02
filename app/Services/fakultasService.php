@@ -27,7 +27,7 @@ class fakultasService
             ->whereRaw('LOWER(nama_fakultas) LIKE ?', ['%' . strtolower($name) . '%'])
             ->paginate(5);
     }
-    public function cretateFakultas($request)
+    public function createFakultas($request)
     {
         /**
          * Menambahkan data fakultas dengan validasi dan parameter inputan POST
@@ -35,23 +35,53 @@ class fakultasService
          *
          */
         try {
+            // melakukan pengecekan parameter nama_fakultas yang wajib di isi dan bertipe string
             $request->validate([
                 'nama_fakultas' => 'required|string',
             ]);
         } catch (ValidationException $e) {
+            // jika pengecekan gagal maka akan mengembalikan response json error
             return response()->json([
-                'message' => 'data gagal di kirimkan',
+                'message' => 'Data gagal di kirimkan',
                 'errors'  => $e->errors(),
-            ]);
+            ], 404);
         }
 
+        // melakukan query builder untuk menambahkan data fakultas
         DB::table('tb_fakultas')
             ->insert([
                 'nama_fakultas' => $request->nama_fakultas,
             ]);
+
+        // mengembalikan response json berupa pesan fakultas berhasil di tambahkan dan menampilkan data fakultas yang suda ditambahkan.
         return response()->json([
             'message' => 'Fakultas berhasil ditambahkan',
             'data'    => DB::table('tb_fakultas')->where('id', DB::getPdo()->lastInsertId())->first(),
         ]);
+    }
+    public function updateFakultas($request, $id)
+    {
+        try {
+            // melakukan pengecekan parameter nama_fakultas yang wajib di isi dan bertipe string
+            $request->validate([
+                'nama_fakultas' => 'required|string',
+            ]);
+        } catch (ValidationException $e) {
+            // jika pengecekan gagal maka akan mengembalikan response json error
+            return response()->json([
+                'message' => 'Data gagal di kirimkan',
+                'errors'  => $e->errors(),
+            ], 404);
+        }
+        // melakukan query builder untuk memperbarui data fakultas
+        DB::table('tb_fakultas')->where('id', $id)->update([
+            'nama_fakultas' => $request->nama_fakultas,
+        ]);
+        // mengembalikan response json berupa pesan fakultas berhasil di perbarui dan menampilkan data fakultas yang suda di perbarui.
+        return response()->json([
+            'message' => 'Fakultas berhasil diubah',
+            'data'    => DB::table('tb_fakultas')->where('id', $id)->first(),
+        ]);
+
     }
 }

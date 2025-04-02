@@ -11,3 +11,5 @@ Route::middleware('api')->get('/fakultas/{id}', [fakultasController::class, 'get
 Route::middleware('api')->get('/fakultas/name/{name?}', [fakultasController::class, 'getFakultasByName']);
 // rute untuk menambahkan data fakultas dengan validasi dan paramter inputan POST
 Route::middleware('api')->post('/fakultas/add', [fakultasController::class, 'createFakultas']);
+// rute untuk memperbarui data fakultas berdasarkan ID
+Route::middleware('api')->put('/fakultas/update/{id}', [fakultasController::class, 'updateFakultas']);
