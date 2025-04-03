@@ -19,5 +19,9 @@ Route::middleware('api')->put('/fakultas/update/{id}', [fakultasController::clas
 Route::middleware('api')->delete('/fakultas/delete/{id}', [fakultasController::class, 'deleteFakultas']);
 
 // ROUTER PRODI
-// rute untuk memanggil semua data prodi dan relasi ke tabel fakultas
+// rute untuk memanggil semua data prodi
 Route::middleware('api')->get('/prodi', [prodiController::class, 'getProdi']);
+// rute untuk memanggil semua data prodi dan relasi ke tabel fakultas
+Route::middleware('api')->get('/prodi/prodiToFakultas', [prodiController::class, 'getProdiToFakultas']);
+// rute untuk memanggil semua data fakultas yang berlerasi dengan prodi dengan relasi satu ke banyak
+Route::middleware('api')->get('/prodi/fakultasToProdi', [prodiController::class, 'getFakultasToProdi']);
