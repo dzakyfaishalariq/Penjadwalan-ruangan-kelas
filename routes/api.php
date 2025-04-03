@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\fakultasController;
+use App\Http\Controllers\prodiController;
 use Illuminate\Support\Facades\Route;
 
+// ROUTER FAKULTAS
 // rute untuk memanggil semua data fakultas
 Route::middleware('api')->get('/fakultas', [fakultasController::class, 'getFakultas']);
 // rute untuk memanggil data fakultas berdasarkan id
@@ -15,3 +17,7 @@ Route::middleware('api')->post('/fakultas/add', [fakultasController::class, 'cre
 Route::middleware('api')->put('/fakultas/update/{id}', [fakultasController::class, 'updateFakultas']);
 // rute untuk menghapus data fakultas berdasarkan ID
 Route::middleware('api')->delete('/fakultas/delete/{id}', [fakultasController::class, 'deleteFakultas']);
+
+// ROUTER PRODI
+// rute untuk memanggil semua data prodi dan relasi ke tabel fakultas
+Route::middleware('api')->get('/prodi', [prodiController::class, 'getProdi']);
