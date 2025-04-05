@@ -38,4 +38,14 @@ class prodiController extends Controller
 
         return $fakutlas_to_prodi;
     }
+
+    public function getProdiById($id)
+    {
+        /**
+         * Memanggil data prodi berdasarkan id prodi yang digunakan untuk menampilkan data dan informasi prodi berdasarkan id_prodi
+         */
+        $prodi_by_id = $this->prodiService->getProdiById($id);
+
+        return $prodi_by_id;
+    }
 }

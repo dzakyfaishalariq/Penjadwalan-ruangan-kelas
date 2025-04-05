@@ -58,4 +58,33 @@ class prodiService
             "data_relasi_fakultas_to_prodi" => array_values($result),
         ]);
     }
+
+    public function getProdiById($id)
+    {
+        // memanggil data prodi berdasarkan id prodi
+        $data_prodi = DB::table('tb_prodi')
+            ->join('tb_fakultas', 'tb_prodi.fakultas_id', '=', 'tb_fakultas.id')
+            ->where('tb_prodi.id', $id)
+            ->select(
+                'tb_prodi.id as prodi_id',
+                'tb_prodi.nama_prodi',
+                'tb_fakultas.id as fakultas_id',
+                'tb_fakultas.nama_fakultas',
+            )
+            ->first();
+
+        // mengembalikan response json
+        return response()->json([
+            'name_data' => "Data prodi berdasarkan id : " . $id,
+            'data'      => [
+                'id'       => $data_prodi->prodi_id,
+                'prodi'    => $data_prodi->nama_prodi,
+                'fakultas' => [
+                    'id'            => $data_prodi->fakultas_id,
+                    'nama_fakultas' => $data_prodi->nama_fakultas,
+                ],
+            ],
+        ]);
+    }
+
 }
