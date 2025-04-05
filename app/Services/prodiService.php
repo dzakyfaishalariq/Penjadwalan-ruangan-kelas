@@ -61,7 +61,7 @@ class prodiService
 
     public function getProdiById($id)
     {
-        // memanggil data prodi berdasarkan id prodi
+        // memanggil data prodi berdasarkan id prodi yang mana data dalam prodi dapat berelasi pada table fakultas dan data fakultas dapat di panggil ke dalam data prodi
         $data_prodi = DB::table('tb_prodi')
             ->join('tb_fakultas', 'tb_prodi.fakultas_id', '=', 'tb_fakultas.id')
             ->where('tb_prodi.id', $id)
@@ -86,5 +86,23 @@ class prodiService
             ],
         ]);
     }
-
+    public function getProdiByName($name)
+    {
+        // memanggil data prodi berdasarkan name prodi yang mana data dalam prodi dapat berelasi pada table fakultas dan data fakultas dapat di panggil ke dalam data prodi
+        $data_prodi = DB::table('tb_prodi')
+            ->join('tb_fakultas', 'tb_prodi.fakultas_id', '=', 'tb_fakultas.id')
+            ->whereRaw('LOWER(tb_prodi.nama_prodi) like ?', ['%' . $name . '%'])
+            ->select(
+                'tb_prodi.id as prodi_id',
+                'tb_prodi.nama_prodi',
+                'tb_fakultas.id as fakultas_id',
+                'tb_fakultas.nama_fakultas',
+            )
+            ->paginate(5);
+        // mengembalikan response json
+        return response()->json([
+            'name_data' => "Data prodi berdasarkan pencarian : " . $name,
+            'data'      => $data_prodi,
+        ]);
+    }
 }

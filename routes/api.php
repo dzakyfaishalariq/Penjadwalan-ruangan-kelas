@@ -27,3 +27,5 @@ Route::middleware('api')->get('/prodi/prodiToFakultas', [prodiController::class,
 Route::middleware('api')->get('/prodi/fakultasToProdi', [prodiController::class, 'getFakultasToProdi']);
 // rute untuk memanggil data prodi berdasarkan id prodi
 Route::middleware('api')->get('/prodi/{id}', [prodiController::class, 'getProdiById']);
+// rute untuk memanggil data prodi berdasarkan name prodi
+Route::middleware('api')->get('/prodi/name/{name?}', [prodiController::class, 'getProdiByName']);

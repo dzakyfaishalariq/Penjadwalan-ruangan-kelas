@@ -48,4 +48,14 @@ class prodiController extends Controller
 
         return $prodi_by_id;
     }
+
+    public function getProdiByName($name)
+    {
+        /**
+         * Memanggil data prodi berdasarkan name prodi yang mana data dalam prodi dapat berelasi pada table fakultas dan data fakultas dapat di panggil ke dalam data prodi
+         */
+        $prodi_by_name = $this->prodiService->getProdiByName($name);
+
+        return $prodi_by_name;
+    }
 }
