@@ -1,6 +1,8 @@
 <?php
 namespace App\Services;
 
+use App\ApiTemplate\Template;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -9,13 +11,32 @@ class fakultasService
     // mengatur logic dari fakultas controller agar tidak terbebani dengan pemanggilan logika yang berhubungan dengan database secara langsung.
     public function getFakultas()
     {
-        // memanggil data fakultas denga paginate 5
-        return DB::table('tb_fakultas')->paginate(5);
+        try {
+            // memanggil data fakultas denga paginate 5
+            $data_get_fakultas = DB::table('tb_fakultas')->paginate(5);
+            // mengembalikan response json
+            $template_respons = new Template(true, 'Data Berhasil di ambil', $data_get_fakultas);
+            return $template_respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $template_respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $template_respons->response();
+        }
     }
     public function getFakultasById($id)
     {
-        // memanggil data fakultas berdasarkan id
-        return DB::table('tb_fakultas')->where('id', $id)->first();
+        try {
+            // memanggil data fakultas berdasarkan id
+            // return DB::table('tb_fakultas')->where('id', $id)->first();
+            $data_get_fakultas_by_id = DB::table('tb_fakultas')->where('id', $id)->first();
+            // mengembalikan response json apabila data berhasil di ambil
+            $template_respons = new Template(true, 'Data Berhasil di ambil', $data_get_fakultas_by_id);
+            return $template_respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $template_respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $template_respons->response();
+        }
     }
     public function getFakultasByName($name)
     {
@@ -23,9 +44,18 @@ class fakultasService
          * memanggil data fakultas berdasarkan name
          * yang mana param $name dapat disi bebas
          */
-        return DB::table('tb_fakultas')
-            ->whereRaw('LOWER(nama_fakultas) LIKE ?', ['%' . strtolower($name) . '%'])
-            ->paginate(5);
+        try {
+            $data_get_fakultas_by_name = DB::table('tb_fakultas')
+                ->whereRaw('LOWER(nama_fakultas) LIKE ?', ['%' . strtolower($name) . '%'])
+                ->paginate(5);
+            // mengembalikan response json
+            $template_respons = new Template(true, 'Data Berhasil di ambil', $data_get_fakultas_by_name);
+            return $template_respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $template_respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $template_respons->response();
+        }
     }
     public function createFakultas($request)
     {
@@ -41,23 +71,37 @@ class fakultasService
             ]);
         } catch (ValidationException $e) {
             // jika pengecekan gagal maka akan mengembalikan response json error
-            return response()->json([
+            $data = [
                 'message' => 'Data gagal di kirimkan',
                 'errors'  => $e->errors(),
-            ], 404);
+            ];
+            $template_respons = new Template(false, 'Data Gagal di kirimkan', $data);
+            return $template_respons->response();
         }
 
         // melakukan query builder untuk menambahkan data fakultas
-        DB::table('tb_fakultas')
-            ->insert([
-                'nama_fakultas' => $request->nama_fakultas,
-            ]);
+        try {
+            DB::table('tb_fakultas')
+                ->insert([
+                    'nama_fakultas' => $request->nama_fakultas,
+                ]);
 
-        // mengembalikan response json berupa pesan fakultas berhasil di tambahkan dan menampilkan data fakultas yang suda ditambahkan.
-        return response()->json([
-            'message' => 'Fakultas berhasil ditambahkan',
-            'data'    => DB::table('tb_fakultas')->where('id', DB::getPdo()->lastInsertId())->first(),
-        ]);
+            // mengembalikan response json berupa pesan fakultas berhasil di tambahkan dan menampilkan data fakultas yang suda ditambahkan.
+            $data = [
+                'message' => 'Fakultas berhasil ditambahkan',
+                'data'    => DB::table('tb_fakultas')->where('id', DB::getPdo()->lastInsertId())->first(),
+            ];
+            $template_respons = new Template(true, 'Data Berhasil di kirimkan', $data);
+            return $template_respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $data = [
+                'message' => 'Data gagal di kirimkan',
+                'errors'  => $e->getMessage(),
+            ];
+            $template_respons = new Template(false, 'Data Gagal di kirimkan', $data);
+            return $template_respons->response();
+        }
     }
     public function updateFakultas($request, $id)
     {
@@ -68,29 +112,66 @@ class fakultasService
             ]);
         } catch (ValidationException $e) {
             // jika pengecekan gagal maka akan mengembalikan response json error
-            return response()->json([
+            $data = [
                 'message' => 'Data gagal di kirimkan',
                 'errors'  => $e->errors(),
-            ], 404);
+            ];
+            $template_respons = new Template(false, 'Data Gagal di kirimkan', $data);
+            return $template_respons->response();
+        }
+
+        try {
+            DB::table('tb_fakultas')->where('id', $id)->update([
+                'nama_fakultas' => $request->nama_fakultas,
+            ]);
+            // mengembalikan response json berupa pesan fakultas berhasil di perbarui dan menampilkan data fakultas yang suda di perbarui.
+            $data = [
+                'message' => 'Fakultas berhasil diubah',
+                'data'    => DB::table('tb_fakultas')->where('id', $id)->first(),
+            ];
+            $template_respons = new Template(true, 'Data Berhasil di kirimkan', $data);
+            return $template_respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $data = [
+                'message' => 'Data gagal di kirimkan',
+                'errors'  => $e->getMessage(),
+            ];
+            $template_respons = new Template(false, 'Data Gagal di kirimkan', $data);
+            return $template_respons->response();
         }
         // melakukan query builder untuk memperbarui data fakultas
-        DB::table('tb_fakultas')->where('id', $id)->update([
-            'nama_fakultas' => $request->nama_fakultas,
-        ]);
-        // mengembalikan response json berupa pesan fakultas berhasil di perbarui dan menampilkan data fakultas yang suda di perbarui.
-        return response()->json([
-            'message' => 'Fakultas berhasil diubah',
-            'data'    => DB::table('tb_fakultas')->where('id', $id)->first(),
-        ]);
 
     }
     public function deleteFakultas($id)
     {
-        // melakukan query builder untuk menghapus data fakultas
-        DB::table('tb_fakultas')->where('id', $id)->delete();
-        // mengembalikan response json berupa pesan fakultas berhasil di hapus
-        return response()->json([
-            'message' => 'Fakultas berhasil dihapus',
-        ]);
+        try {
+            if (DB::table('tb_fakultas')->where('id', $id)->first() == null) {
+                // mengembalikan response json apabila data fakultas tidak ditemukan
+                $data = [
+                    'message' => 'Data fakultas tidak ditemukan',
+                    'data'    => null,
+                ];
+                $template_respons = new Template(false, 'Data Gagal di kirimkan', $data);
+                return $template_respons->response();
+            }
+            // melakukan query builder untuk menghapus data fakultas
+            DB::table('tb_fakultas')->where('id', $id)->delete();
+            // mengembalikan response json berupa pesan fakultas berhasil di hapus
+            $data = [
+                'message' => 'Fakultas berhasil dihapus',
+                'data'    => null,
+            ];
+            $template_respons = new Template(true, 'Data Berhasil di kirimkan', $data);
+            return $template_respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $data = [
+                'message' => 'Data gagal di kirimkan',
+                'errors'  => $e->getMessage(),
+            ];
+            $template_respons = new Template(false, 'Data Gagal di kirimkan', $data);
+            return $template_respons->response();
+        }
     }
 }

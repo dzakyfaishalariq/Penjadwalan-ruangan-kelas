@@ -8,6 +8,7 @@ class prodiController extends Controller
     /**
      * inisialisiasi constractor yang menampung variabel class prodi service untuk memanggil fungsi yang berkaitan dengan manajemen data prodi.
      */
+    public $prodiService;
     public function __construct(prodiService $prodiService)
     {
         $this->prodiService = $prodiService;

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 class fakultasController extends Controller
 {
     // membuat constructor untuk menampung variabel class services
+    public $fakultasService;
     public function __construct(fakultasService $fakultasService)
     {
         $this->fakultasService = $fakultasService;
@@ -16,21 +17,21 @@ class fakultasController extends Controller
     {
         $fakultas = $this->fakultasService->getFakultas();
 
-        return response()->json($fakultas);
+        return $fakultas;
     }
     // Memanggil data fakultas berdasarkan id
     public function getFakultasById($id)
     {
         $fakultas = $this->fakultasService->getFakultasById($id);
 
-        return response()->json($fakultas);
+        return $fakultas;
     }
     // Memanggil data fakultas berdasarkan name
     public function getFakultasByName($name)
     {
         $fakultas = $this->fakultasService->getFakultasByName($name);
 
-        return response()->json($fakultas);
+        return $fakultas;
     }
     // memanggil fungsi untuk menambahkan data fakultas dengan validasi dan paramter inputan POST
     public function createFakultas(Request $request)
