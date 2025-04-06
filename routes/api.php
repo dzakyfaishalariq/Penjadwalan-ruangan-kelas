@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\fakultasController;
+use App\Http\Controllers\pemilihanController;
 use App\Http\Controllers\prodiController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,3 +36,7 @@ Route::middleware('api')->post('/prodi/add', [prodiController::class, 'createPro
 Route::middleware('api')->put('/prodi/update/{id}', [prodiController::class, 'updateProdi']);
 // rute untuk menghapus data prodi berdasarkan ID
 Route::middleware('api')->delete('/prodi/delete/{id}', [prodiController::class, 'deleteProdi']);
+
+// ROUTER PEMILIHAN
+// rute untuk memanggil semua data pemilihan
+Route::middleware('api')->get('/pemilihan/{paginate}', [pemilihanController::class, 'getPemilihan']);
