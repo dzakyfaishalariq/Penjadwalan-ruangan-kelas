@@ -158,4 +158,36 @@ class prodiService
             return $respons->response();
         }
     }
+    public function updateProdi($request, $id)
+    {
+        try {
+            // validasi data yang dikirim teridiri dari tiga parameter yang mana dua dari varieabel request dan id (integer)
+            $id      = (int) $id;
+            $kondisi = $request->validate([
+                'fakultas_id' => 'required|integer',
+                'nama_prodi'  => 'required|string|max:255',
+            ]);
+            // melakukan perkondisian apabila kondisi memenuhi data prodi akan di update kedalam table prodi jika gagal akan mengembalikan response json dengan pesan error.
+            if ($kondisi) {
+                DB::table('tb_prodi')->where('id', $id)->update([
+                    'fakultas_id' => $request->fakultas_id,
+                    'nama_prodi'  => $request->nama_prodi,
+                ]);
+                $data = [
+                    'fakultas_id' => $request->fakultas_id,
+                    'nama_prodi'  => $request->nama_prodi,
+                ];
+                $respons = new Template(true, 'Data Berhasil di update', $data);
+                return $respons->response();
+            } else {
+                $respons = new Template(false, 'Data Gagal di update', $kondisi);
+                return $respons->response();
+            }
+        } catch (Exception $e) {
+            //throw $e;
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di update', $e->getMessage());
+            return $respons->response();
+        }
+    }
 }

@@ -61,10 +61,19 @@ class prodiController extends Controller
         return $prodi_by_name;
     }
 
-    public function createProdi(Request $request){
+    public function createProdi(Request $request)
+    {
         // memanggil fungsi untuk menambahkan data prodi dengan validasi dan parameter inputan POST
         $prodi_add = $this->prodiService->createProdi($request);
 
         return $prodi_add;
+    }
+
+    public function updateProdi(Request $request, $id)
+    {
+        // memanggil fungsi untuk mengupdate data prodi dengan validasi dan parameter inputan POST
+        $prodi_update = $this->prodiService->updateProdi($request, $id);
+
+        return $prodi_update;
     }
 }

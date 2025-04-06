@@ -31,3 +31,5 @@ Route::middleware('api')->get('/prodiById/{id}', [prodiController::class, 'getPr
 Route::middleware('api')->get('/prodiByName/{paginate}/name/{name?}', [prodiController::class, 'getProdiByName']);
 // rute untuk menambahkan data prodi dengan validasi dan paramter inputan POST
 Route::middleware('api')->post('/prodi/add', [prodiController::class, 'createProdi']);
+// rute untuk memperbarui data prodi berdasarkan ID
+Route::middleware('api')->put('/prodi/update/{id}', [prodiController::class, 'updateProdi']);
