@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\prodiService;
+use Illuminate\Http\Request;
 
 class prodiController extends Controller
 {
@@ -58,5 +59,12 @@ class prodiController extends Controller
         $prodi_by_name = $this->prodiService->getProdiByName($paginate, $name);
 
         return $prodi_by_name;
+    }
+
+    public function createProdi(Request $request){
+        // memanggil fungsi untuk menambahkan data prodi dengan validasi dan parameter inputan POST
+        $prodi_add = $this->prodiService->createProdi($request);
+
+        return $prodi_add;
     }
 }

@@ -123,4 +123,39 @@ class prodiService
             return $respons->response();
         }
     }
+    public function createProdi($request)
+    {
+        // membuat code untuk menambahkan data prodi dengan validasi dan parameter inputan POST yang berlerasi dengan fakultas.
+        try {
+            // validasi data yang dikirim teridiri dari dua parameter fakultas_id (integer) dan nama_prodi (string)
+            $kondisi = $request->validate([
+                'fakultas_id' => 'required|integer',
+                'nama_prodi'  => 'required|string',
+            ]);
+            // melakukan perkondisian apabila kondisi memenuhi data prodi akan ditambahkan kedalam table prodi jika gagal akan mengembalikan response json dengan pesan error.
+            if ($kondisi) {
+                DB::table('tb_prodi')->insert([
+                    'fakultas_id' => $request->fakultas_id,
+                    'nama_prodi'  => $request->nama_prodi,
+                ]);
+                $data = [
+                    'message' => 'Data Berhasil di tambahkan',
+                    'data'    => [
+                        'fakultas_id' => $request->fakultas_id,
+                        'nama_prodi'  => $request->nama_prodi,
+                    ],
+                ];
+                $respons = new Template(true, 'Data Berhasil di tambahkan', $data);
+                return $respons->response();
+            } else {
+                $respons = new Template(false, 'Data Gagal di tambahkan', $kondisi);
+                return $respons->response();
+            }
+        } catch (Exception $e) {
+            //throw $e;
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di tambahkan', $e->getMessage());
+            return $respons->response();
+        }
+    }
 }
