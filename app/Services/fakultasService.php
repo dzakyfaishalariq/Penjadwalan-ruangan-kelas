@@ -9,11 +9,13 @@ use Illuminate\Validation\ValidationException;
 class fakultasService
 {
     // mengatur logic dari fakultas controller agar tidak terbebani dengan pemanggilan logika yang berhubungan dengan database secara langsung.
-    public function getFakultas()
+    public function getFakultas($paginate)
     {
+        // ubah variabel paginate ke integer
         try {
+            $paginate = (int) $paginate;
             // memanggil data fakultas denga paginate 5
-            $data_get_fakultas = DB::table('tb_fakultas')->paginate(5);
+            $data_get_fakultas = DB::table('tb_fakultas')->paginate($paginate);
             // mengembalikan response json
             $template_respons = new Template(true, 'Data Berhasil di ambil', $data_get_fakultas);
             return $template_respons->response();
@@ -30,7 +32,7 @@ class fakultasService
             // return DB::table('tb_fakultas')->where('id', $id)->first();
             $data_get_fakultas_by_id = DB::table('tb_fakultas')->where('id', $id)->first();
             // mengembalikan response json apabila data berhasil di ambil
-            $template_respons = new Template(true, 'Data Berhasil di ambil', $data_get_fakultas_by_id);
+            $template_respons = new Template(true, 'Data Berhasil di ambil dari id', $data_get_fakultas_by_id);
             return $template_respons->response();
         } catch (Exception $e) {
             // mengembalikan response json apabila terjadi error
@@ -38,16 +40,17 @@ class fakultasService
             return $template_respons->response();
         }
     }
-    public function getFakultasByName($name)
+    public function getFakultasByName($paginate, $name)
     {
         /**
          * memanggil data fakultas berdasarkan name
          * yang mana param $name dapat disi bebas
          */
         try {
+            $paginate = (int) $paginate;
             $data_get_fakultas_by_name = DB::table('tb_fakultas')
                 ->whereRaw('LOWER(nama_fakultas) LIKE ?', ['%' . strtolower($name) . '%'])
-                ->paginate(5);
+                ->paginate($paginate);
             // mengembalikan response json
             $template_respons = new Template(true, 'Data Berhasil di ambil', $data_get_fakultas_by_name);
             return $template_respons->response();

@@ -14,28 +14,28 @@ class prodiController extends Controller
         $this->prodiService = $prodiService;
     }
 
-    public function getProdi()
+    public function getProdi($paginate)
     {
         // memanggil semua data prodi
-        $prodi = $this->prodiService->getProdi();
+        $prodi = $this->prodiService->getProdi($paginate);
 
         return $prodi;
     }
-    public function getProdiToFakultas()
+    public function getProdiToFakultas($paginate)
     {
         // memanggil data prodi dengan relasi pada table fakultas
-        $prodi = $this->prodiService->getProdiToFakultas();
+        $prodi = $this->prodiService->getProdiToFakultas($paginate);
 
         return $prodi;
     }
 
-    public function getFakultasToProdi()
+    public function getFakultasToProdi($paginate)
     {
         /**
          * Memanggil data fakultas yang berlerasi dengan prodi dengan relasi satu ke banyak
          * hasil keluaranya berupa data fakultas yang didalamnya ada beberapa data prodi.
          */
-        $fakutlas_to_prodi = $this->prodiService->getFakultasToProdi();
+        $fakutlas_to_prodi = $this->prodiService->getFakultasToProdi($paginate);
 
         return $fakutlas_to_prodi;
     }
@@ -50,12 +50,12 @@ class prodiController extends Controller
         return $prodi_by_id;
     }
 
-    public function getProdiByName($name)
+    public function getProdiByName($paginate, $name)
     {
         /**
          * Memanggil data prodi berdasarkan name prodi yang mana data dalam prodi dapat berelasi pada table fakultas dan data fakultas dapat di panggil ke dalam data prodi
          */
-        $prodi_by_name = $this->prodiService->getProdiByName($name);
+        $prodi_by_name = $this->prodiService->getProdiByName($paginate, $name);
 
         return $prodi_by_name;
     }

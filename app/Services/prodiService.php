@@ -1,6 +1,8 @@
 <?php
 namespace App\Services;
 
+use App\ApiTemplate\Template;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -8,55 +10,62 @@ use Illuminate\Support\Facades\DB;
  */
 class prodiService
 {
-    public function getProdi()
+    public function getProdi($paginate)
     {
-        // fungsi memanggil semua data prodi
-        $data = DB::table('tb_prodi')->paginate(5);
-        // mengembalikan response json
-        return response()->json($data);
+        try {
+            // ubah variabel paginate ke integer
+            $paginate = (int) $paginate;
+            // fungsi memanggil semua data prodi
+            $data = DB::table('tb_prodi')->paginate($paginate);
+            // mengembalikan response json
+            $respons = new Template(true, 'Data Berhasil di ambil', $data);
+            return $respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
     }
-    public function getProdiToFakultas()
+    public function getProdiToFakultas($paginate)
     {
-        // fungsi memanggil semua data prodi dengan relasi pada table fakultas
-        $data = DB::table('tb_prodi')
-            ->join('tb_fakultas', 'tb_prodi.fakultas_id', '=', 'tb_fakultas.id')
-            ->select('tb_prodi.id', 'tb_fakultas.nama_fakultas', 'tb_prodi.nama_prodi')
-            ->paginate(5);
-        // mengembalikan response json
-        return response()->json($data);
+        try {
+            // ubah variabel paginate ke integer
+            $paginate = (int) $paginate;
+            // fungsi memanggil semua data prodi dengan relasi pada table fakultas
+            $data = DB::table('tb_prodi')
+                ->join('tb_fakultas', 'tb_prodi.fakultas_id', '=', 'tb_fakultas.id')
+                ->select('tb_prodi.id', 'tb_fakultas.nama_fakultas', 'tb_prodi.nama_prodi')
+                ->paginate($paginate);
+            // mengembalikan response json
+            $respons = new Template(true, 'Data Berhasil di ambil', $data);
+            return $respons->response();
+        } catch (Exception $e) {
+            //throw $e;
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
     }
 
-    public function getFakultasToProdi()
+    public function getFakultasToProdi($paginate)
     {
-        // memanggil semua data fakultas dengan relasi pada table prodi yang mana tiap fakultas akan menampilkan data prodi di dalamnya
-        $data_fakultas_to_prodi = DB::table('tb_fakultas')
-            ->leftJoin('tb_prodi', 'tb_fakultas.id', '=', 'tb_prodi.fakultas_id')
-            ->select('tb_fakultas.id as fakultas_id', 'tb_fakultas.nama_fakultas', 'tb_prodi.id as prodi_id', 'tb_prodi.nama_prodi')
-            ->get();
-        // melakukan pengelompokan data prodi berdasarkan fakultas
-        $result = [];
-        foreach ($data_fakultas_to_prodi as $item) {
-            $fakultas_id = $item->fakultas_id;
-            // melakukan pengecekan apakah fakultas sudah ada di array
-            if (! isset($result[$fakultas_id])) {
-                $result[$fakultas_id] = [
-                    'fakultas_id'   => $fakultas_id,
-                    'nama_fakultas' => $item->nama_fakultas,
-                    'prodi'         => [],
-                ];
-            }
-            // melakukan pengecekan apakah prodi sudah ada di array
-            if ($item->prodi_id !== null) {
-                $result[$fakultas_id]['prodi'][] = [
-                    "id"         => $item->prodi_id,
-                    "nama_prodi" => $item->nama_prodi,
-                ];
-            }
+        try {
+            // ubah variabel paginate ke integer
+            $paginate = (int) $paginate;
+            // memanggil semua data fakultas dengan relasi pada table prodi yang mana tiap fakultas akan menampilkan data prodi di dalamnya
+            $data_fakultas_to_prodi = DB::table('tb_fakultas')
+                ->leftJoin('tb_prodi', 'tb_fakultas.id', '=', 'tb_prodi.fakultas_id')
+                ->select('tb_fakultas.id as fakultas_id', 'tb_fakultas.nama_fakultas', 'tb_prodi.id as prodi_id', 'tb_prodi.nama_prodi')
+                ->paginate($paginate);
+            // mengembalikan response json
+            $respons = new Template(true, 'Data Berhasil di ambil', $data_fakultas_to_prodi);
+            return $respons->response();
+        } catch (Exception $e) {
+            //throw $e;
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
         }
-        // mengembalikan response json
-        return response()->json([
-            "data_relasi_fakultas_to_prodi" => array_values($result),
-        ]);
     }
 
     public function getProdiById($id)
@@ -74,7 +83,7 @@ class prodiService
             ->first();
 
         // mengembalikan response json
-        return response()->json([
+        $data = [
             'name_data' => "Data prodi berdasarkan id : " . $id,
             'data'      => [
                 'id'       => $data_prodi->prodi_id,
@@ -84,25 +93,34 @@ class prodiService
                     'nama_fakultas' => $data_prodi->nama_fakultas,
                 ],
             ],
-        ]);
+        ];
+        $respons = new Template(true, 'Data Berhasil di ambil', $data);
+        return $respons->response();
     }
-    public function getProdiByName($name)
+    public function getProdiByName($paginate, $name)
     {
-        // memanggil data prodi berdasarkan name prodi yang mana data dalam prodi dapat berelasi pada table fakultas dan data fakultas dapat di panggil ke dalam data prodi
-        $data_prodi = DB::table('tb_prodi')
-            ->join('tb_fakultas', 'tb_prodi.fakultas_id', '=', 'tb_fakultas.id')
-            ->whereRaw('LOWER(tb_prodi.nama_prodi) like ?', ['%' . $name . '%'])
-            ->select(
-                'tb_prodi.id as prodi_id',
-                'tb_prodi.nama_prodi',
-                'tb_fakultas.id as fakultas_id',
-                'tb_fakultas.nama_fakultas',
-            )
-            ->paginate(5);
-        // mengembalikan response json
-        return response()->json([
-            'name_data' => "Data prodi berdasarkan pencarian : " . $name,
-            'data'      => $data_prodi,
-        ]);
+        try {
+            // ubah variabel paginate ke integer
+            $paginate = (int) $paginate;
+            // memanggil data prodi berdasarkan name prodi yang mana data dalam prodi dapat berelasi pada table fakultas dan data fakultas dapat di panggil ke dalam data prodi
+            $data_prodi = DB::table('tb_prodi')
+                ->join('tb_fakultas', 'tb_prodi.fakultas_id', '=', 'tb_fakultas.id')
+                ->whereRaw('LOWER(tb_prodi.nama_prodi) like ?', ['%' . $name . '%'])
+                ->select(
+                    'tb_prodi.id as prodi_id',
+                    'tb_prodi.nama_prodi',
+                    'tb_fakultas.id as fakultas_id',
+                    'tb_fakultas.nama_fakultas',
+                )
+                ->paginate($paginate);
+            // mengembalikan response json
+            $respons = new Template(true, 'Data Berhasil di ambil', $data_prodi);
+            return $respons->response();
+        } catch (Exception $e) {
+            //throw $e;
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
     }
 }

@@ -13,9 +13,9 @@ class fakultasController extends Controller
         $this->fakultasService = $fakultasService;
     }
     // Memanggil data fakultas dari poltekes kemenkes bengkulu di database
-    public function getFakultas()
+    public function getFakultas($paginate)
     {
-        $fakultas = $this->fakultasService->getFakultas();
+        $fakultas = $this->fakultasService->getFakultas($paginate);
 
         return $fakultas;
     }
@@ -27,9 +27,9 @@ class fakultasController extends Controller
         return $fakultas;
     }
     // Memanggil data fakultas berdasarkan name
-    public function getFakultasByName($name)
+    public function getFakultasByName($paginate, $name)
     {
-        $fakultas = $this->fakultasService->getFakultasByName($name);
+        $fakultas = $this->fakultasService->getFakultasByName($paginate, $name);
 
         return $fakultas;
     }
