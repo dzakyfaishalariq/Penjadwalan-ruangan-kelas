@@ -190,4 +190,19 @@ class prodiService
             return $respons->response();
         }
     }
+    public function deleteProdi($id)
+    {
+        try {
+            // menghapus data prodi berdasarkan id
+            DB::table('tb_prodi')->where('id', $id)->delete();
+            // mengembalikan response json
+            $respons = new Template(true, 'Data Berhasil di hapus', null);
+            return $respons->response();
+        } catch (Exception $e) {
+            //throw $e;
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di hapus', $e->getMessage());
+            return $respons->response();
+        }
+    }
 }

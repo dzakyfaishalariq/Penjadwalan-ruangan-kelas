@@ -33,3 +33,5 @@ Route::middleware('api')->get('/prodiByName/{paginate}/name/{name?}', [prodiCont
 Route::middleware('api')->post('/prodi/add', [prodiController::class, 'createProdi']);
 // rute untuk memperbarui data prodi berdasarkan ID
 Route::middleware('api')->put('/prodi/update/{id}', [prodiController::class, 'updateProdi']);
+// rute untuk menghapus data prodi berdasarkan ID
+Route::middleware('api')->delete('/prodi/delete/{id}', [prodiController::class, 'deleteProdi']);

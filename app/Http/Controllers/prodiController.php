@@ -76,4 +76,12 @@ class prodiController extends Controller
 
         return $prodi_update;
     }
+
+    public function deleteProdi($id)
+    {
+        // memanggil fungsi untuk menghapus data prodi
+        $prodi_delete = $this->prodiService->deleteProdi($id);
+
+        return $prodi_delete;
+    }
 }
