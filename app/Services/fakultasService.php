@@ -47,7 +47,7 @@ class fakultasService
          * yang mana param $name dapat disi bebas
          */
         try {
-            $paginate = (int) $paginate;
+            $paginate                  = (int) $paginate;
             $data_get_fakultas_by_name = DB::table('tb_fakultas')
                 ->whereRaw('LOWER(nama_fakultas) LIKE ?', ['%' . strtolower($name) . '%'])
                 ->paginate($paginate);
@@ -84,15 +84,16 @@ class fakultasService
 
         // melakukan query builder untuk menambahkan data fakultas
         try {
-            DB::table('tb_fakultas')
-                ->insert([
+            DB::beginTransaction();
+            $insert_data = DB::table('tb_fakultas')
+                ->insertGetId([
                     'nama_fakultas' => $request->nama_fakultas,
                 ]);
-
+            DB::commit();
             // mengembalikan response json berupa pesan fakultas berhasil di tambahkan dan menampilkan data fakultas yang suda ditambahkan.
             $data = [
                 'message' => 'Fakultas berhasil ditambahkan',
-                'data'    => DB::table('tb_fakultas')->where('id', DB::getPdo()->lastInsertId())->first(),
+                'data'    => DB::table('tb_fakultas')->where('id', $insert_data)->first(),
             ];
             $template_respons = new Template(true, 'Data Berhasil di kirimkan', $data);
             return $template_respons->response();
@@ -124,9 +125,32 @@ class fakultasService
         }
 
         try {
-            DB::table('tb_fakultas')->where('id', $id)->update([
+            // cek apakah data fakultas dengan id tersebut ada
+            if (DB::table('tb_fakultas')->where('id', $id)->first() == null) {
+                // mengembalikan response json apabila data fakultas tidak ditemukan
+                $data = [
+                    'message' => 'Data fakultas tidak ditemukan',
+                    'data'    => null,
+                ];
+                $template_respons = new Template(false, 'Data tidak ditemukan', $data);
+                return $template_respons->response();
+            }
+            // melakukan query builder untuk memperbarui data fakultas
+            DB::beginTransaction();
+            $update_data = DB::table('tb_fakultas')->where('id', $id)->update([
                 'nama_fakultas' => $request->nama_fakultas,
             ]);
+            // melakukan pengecekan apakah data berhasil di perbarui
+            if ($update_data === 0) {
+                DB::rollBack();
+                $respon = [
+                    'message' => 'Fakultas gagal di perbarui',
+                    'errors'  => 'Data dengan id ' . $id . ' tidak ditemukan',
+                ];
+                $template_respons = new Template(false, 'Data Gagal di kirimkan', $respon);
+                return $template_respons->response();
+            }
+            DB::commit();
             // mengembalikan response json berupa pesan fakultas berhasil di perbarui dan menampilkan data fakultas yang suda di perbarui.
             $data = [
                 'message' => 'Fakultas berhasil diubah',
@@ -155,7 +179,7 @@ class fakultasService
                     'message' => 'Data fakultas tidak ditemukan',
                     'data'    => null,
                 ];
-                $template_respons = new Template(false, 'Data Gagal di kirimkan', $data);
+                $template_respons = new Template(false, 'Data tidak ditemukan', $data);
                 return $template_respons->response();
             }
             // melakukan query builder untuk menghapus data fakultas
