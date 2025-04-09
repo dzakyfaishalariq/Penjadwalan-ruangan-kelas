@@ -134,18 +134,14 @@ class prodiService
             ]);
             // melakukan perkondisian apabila kondisi memenuhi data prodi akan ditambahkan kedalam table prodi jika gagal akan mengembalikan response json dengan pesan error.
             if ($kondisi) {
-                DB::table('tb_prodi')->insert([
+                DB::beginTransaction();
+                $tambah_data = DB::table('tb_prodi')->insertGetId([
                     'fakultas_id' => $request->fakultas_id,
                     'nama_prodi'  => $request->nama_prodi,
                 ]);
-                $data = [
-                    'message' => 'Data Berhasil di tambahkan',
-                    'data'    => [
-                        'fakultas_id' => $request->fakultas_id,
-                        'nama_prodi'  => $request->nama_prodi,
-                    ],
-                ];
-                $respons = new Template(true, 'Data Berhasil di tambahkan', $data);
+                DB::commit();
+                $data_prodi_tambah = DB::table('tb_prodi')->where('id', $tambah_data)->first();
+                $respons           = new Template(true, 'Data Berhasil di tambahkan', $data_prodi_tambah);
                 return $respons->response();
             } else {
                 $respons = new Template(false, 'Data Gagal di tambahkan', $kondisi);
@@ -169,14 +165,18 @@ class prodiService
             ]);
             // melakukan perkondisian apabila kondisi memenuhi data prodi akan di update kedalam table prodi jika gagal akan mengembalikan response json dengan pesan error.
             if ($kondisi) {
-                DB::table('tb_prodi')->where('id', $id)->update([
+                DB::beginTransaction();
+                $data_upadate = DB::table('tb_prodi')->where('id', $id)->update([
                     'fakultas_id' => $request->fakultas_id,
                     'nama_prodi'  => $request->nama_prodi,
                 ]);
-                $data = [
-                    'fakultas_id' => $request->fakultas_id,
-                    'nama_prodi'  => $request->nama_prodi,
-                ];
+                if ($data_upadate === 0) {
+                    DB::rollBack();
+                    $respons = new Template(false, 'Data Gagal di update', 'Data tidak ditemukan');
+                    return $respons->response();
+                }
+                DB::commit();
+                $data    = DB::table('tb_prodi')->where('id', $id)->first();
                 $respons = new Template(true, 'Data Berhasil di update', $data);
                 return $respons->response();
             } else {
@@ -193,6 +193,13 @@ class prodiService
     public function deleteProdi($id)
     {
         try {
+            // jika id tidak ditemukan maka akan mengembalikan response json dengan pesan error
+            $id   = (int) $id;
+            $data = DB::table('tb_prodi')->where('id', $id)->first();
+            if ($data == null) {
+                $respons = new Template(false, 'Data Gagal di hapus', 'Data tidak ditemukan');
+                return $respons->response();
+            }
             // menghapus data prodi berdasarkan id
             DB::table('tb_prodi')->where('id', $id)->delete();
             // mengembalikan response json
