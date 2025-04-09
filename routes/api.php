@@ -40,3 +40,11 @@ Route::middleware('api')->delete('/prodi/delete/{id}', [prodiController::class, 
 // ROUTER PEMILIHAN
 // rute untuk memanggil semua data pemilihan
 Route::middleware('api')->get('/pemilihan/{paginate}', [pemilihanController::class, 'getPemilihan']);
+// rute untuk memanggil data pemilihan berdasarkan id pemilihan
+Route::middleware('api')->get('/pemilihanById/{id}', [pemilihanController::class, 'getPemilihanById']);
+// rute untuk menambahkan data pemilihan dengan validasi dan paramter inputan POST
+Route::middleware('api')->post('/pemilihan/add', [pemilihanController::class, 'createPemilihan']);
+// rute untuk memperbarui data pemilihan berdasarkan ID
+Route::middleware('api')->put('/pemilihan/update/{id}', [pemilihanController::class, 'updatePemilihan']);
+// rute untuk menghapus data pemilihan berdasarkan ID
+Route::middleware('api')->delete('/pemilihan/delete/{id}', [pemilihanController::class, 'deletePemilihan']);
