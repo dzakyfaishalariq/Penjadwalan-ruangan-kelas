@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\dosenController;
 use App\Http\Controllers\fakultasController;
 use App\Http\Controllers\pemilihanController;
 use App\Http\Controllers\prodiController;
@@ -48,3 +49,11 @@ Route::middleware('api')->post('/pemilihan/add', [pemilihanController::class, 'c
 Route::middleware('api')->put('/pemilihan/update/{id}', [pemilihanController::class, 'updatePemilihan']);
 // rute untuk menghapus data pemilihan berdasarkan ID
 Route::middleware('api')->delete('/pemilihan/delete/{id}', [pemilihanController::class, 'deletePemilihan']);
+
+//Router User DOSEN
+// rute untuk memanggil semua data dosen
+Route::middleware('api')->get('/dosen/{paginate}', [dosenController::class, 'getDosen']);
+// rute untuk memanggil data dosen berdasarkan id dosen
+Route::middleware('api')->get('/dosenById/{id}', [dosenController::class, 'getDosenById']);
+// rute untuk menambahkan data dosen dengan validasi dan paramter inputan POST
+Route::middleware('api')->post('/dosen/add', [dosenController::class, 'createDosen']);
