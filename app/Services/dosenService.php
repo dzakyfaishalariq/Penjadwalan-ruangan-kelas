@@ -125,6 +125,7 @@ class dosenService
     }
     public function updateDosen($request, $id)
     {
+        // fungsi untuk mengupdate data dosen
         try {
             $data_dosen = DB::table('tb_dosen')->where('id', $id)->first();
             // cek apakah data ada berdasarkan id
@@ -182,6 +183,29 @@ class dosenService
                 $respons = new Template(false, 'Data Gagal di update', $kondisi);
                 return $respons->response();
             }
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
+
+    public function deleteDosen($id)
+    {
+        // fungsi untuk menghapus data dosen
+        try {
+            $data_dosen = DB::table('tb_dosen')->where('id', $id)->first();
+            // cek apakah data ada berdasarkan id
+            if ($data_dosen == null) {
+                $respons = new Template(false, 'Data Gagal di delete', 'Data dosen tidak ditemukan');
+                return $respons->response();
+            }
+            DB::beginTransaction();
+            DB::table('tb_pemilihan')->where('id', $data_dosen->pemilih_id)->delete();
+            DB::table('tb_dosen')->where('id', $id)->delete();
+            DB::commit();
+            $respons = new Template(true, 'Data Berhasil di delete', $data_dosen);
+            return $respons->response();
         } catch (Exception $e) {
             // mengembalikan response json apabila terjadi error
             $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());

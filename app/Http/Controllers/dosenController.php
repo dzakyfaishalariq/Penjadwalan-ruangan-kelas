@@ -41,4 +41,11 @@ class dosenController extends Controller
 
         return $respons;
     }
+
+    public function deleteDosen($id)
+    {
+        $respons = $this->dosenService->deleteDosen($id);
+
+        return $respons;
+    }
 }
