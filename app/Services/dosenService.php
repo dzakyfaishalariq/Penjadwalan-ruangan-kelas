@@ -123,4 +123,69 @@ class dosenService
             return $respons->response();
         }
     }
+    public function updateDosen($request, $id)
+    {
+        try {
+            $data_dosen = DB::table('tb_dosen')->where('id', $id)->first();
+            // cek apakah data ada berdasarkan id
+            if ($data_dosen == null) {
+                $respons = new Template(false, 'Data Gagal di update', 'Data dosen tidak ditemukan');
+                return $respons->response();
+            }
+            // melakukan validasi data yang akan di inputkan
+            $kondisi = $request->validate([
+                'prodi_id' => 'required|integer',
+                'tipe'     => 'required|string|max:255',
+                'nama'     => 'required|string|max:255',
+                'nip'      => 'required|string|max:255',
+                'email'    => 'required|string|max:255',
+                'username' => 'required|string|max:255',
+                'password' => 'required|string|min:8|max:255',
+            ]);
+            // cek kondisi apabila memenuhi data dosen akan di tambahkan kedalam table dosen jika gagal akan mengembalikan response json dengan pesan error
+            if ($kondisi) {
+                DB::beginTransaction();
+                //update data pemilihan
+                $data_pemilihan = DB::table('tb_pemilihan')->where('id', $data_dosen->pemilih_id)->update([
+                    'nama' => $request->nama,
+                    'tipe' => $request->tipe,
+                ]);
+                if ($data_pemilihan === 0) {
+                    DB::rollBack();
+                    $respons = new Template(false, 'Data Gagal di update', 'Data pemilihan tidak ditemukan');
+                    return $respons->response();
+                }
+                $data_dosen_update = DB::table('tb_dosen')->where('id', $id)->update([
+                    'prodi_id'   => $request->prodi_id,
+                    'pemilih_id' => $data_dosen->pemilih_id,
+                    'nama'       => $request->nama,
+                    'nip'        => $request->nip,
+                    'email'      => $request->email,
+                    'username'   => $request->username,
+                    'password'   => Hash::make($request->password),
+                ]);
+                if ($data_dosen_update === 0) {
+                    DB::rollBack();
+                    $respons = new Template(false, 'Data Gagal di update', 'Data dosen tidak ditemukan');
+                    return $respons->response();
+                }
+                DB::commit();
+                $data_pemilih_hasil_update = DB::table('tb_pemilihan')->where('id', $data_dosen->pemilih_id)->first();
+                $data_dosen_hasil_update   = DB::table('tb_dosen')->where('id', $id)->first();
+                $data                      = [
+                    'pemilihan'  => $data_pemilih_hasil_update,
+                    'data_dosen' => $data_dosen_hasil_update,
+                ];
+                $respons = new Template(true, 'Data Berhasil di update', $data);
+                return $respons->response();
+            } else {
+                $respons = new Template(false, 'Data Gagal di update', $kondisi);
+                return $respons->response();
+            }
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
 }

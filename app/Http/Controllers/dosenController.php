@@ -34,4 +34,11 @@ class dosenController extends Controller
 
         return $respons;
     }
+
+    public function updateDosen(Request $request, $id)
+    {
+        $respons = $this->dosenService->updateDosen($request, $id);
+
+        return $respons;
+    }
 }

@@ -57,3 +57,5 @@ Route::middleware('api')->get('/dosen/{paginate}', [dosenController::class, 'get
 Route::middleware('api')->get('/dosenById/{id}', [dosenController::class, 'getDosenById']);
 // rute untuk menambahkan data dosen dengan validasi dan paramter inputan POST
 Route::middleware('api')->post('/dosen/add', [dosenController::class, 'createDosen']);
+// rute untuk memperbarui data dosen berdasarkan ID
+Route::middleware('api')->put('/dosen/update/{id}', [dosenController::class, 'updateDosen']);
