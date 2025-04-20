@@ -15,11 +15,15 @@ class dosenService
             // mengambil semua data dosen dengan relasi pada table prodi
             $data_dosen = DB::table('tb_dosen')
                 ->join("tb_prodi", "tb_dosen.prodi_id", "=", "tb_prodi.id")
+                ->join("tb_pemilihan", "tb_dosen.pemilih_id", "=", "tb_pemilihan.id")
                 ->select(
                     'tb_prodi.id as prodi_id',
                     'tb_prodi.fakultas_id as fakultas_id',
                     'tb_prodi.nama_prodi as prodi',
-                    'tb_dosen.id as pemilihan_id',
+                    'tb_pemilihan.id as pemilihan_id',
+                    'tb_pemilihan.nama as nama_pemilih',
+                    'tb_pemilihan.tipe as tipe_pemilih',
+                    'tb_dosen.id as dosen_id',
                     'tb_dosen.nama as dosen',
                     'tb_dosen.nip as nip',
                     'tb_dosen.email as email',
@@ -46,10 +50,14 @@ class dosenService
             // mengambil data dosen berdasarkan ID dosen
             $data_dosen_by_id = DB::table('tb_dosen')->where('tb_dosen.id', $id)
                 ->join('tb_prodi', 'tb_dosen.prodi_id', '=', 'tb_prodi.id')
+                ->join('tb_pemilihan', 'tb_dosen.pemilih_id', '=', 'tb_pemilihan.id')
                 ->select(
                     'tb_prodi.id as prodi_id',
                     'tb_prodi.fakultas_id as fakultas_id',
                     'tb_prodi.nama_prodi as prodi',
+                    'tb_pemilihan.id as pemilihan_id',
+                    'tb_pemilihan.nama as nama_pemilih',
+                    'tb_pemilihan.tipe as tipe_pemilih',
                     'tb_dosen.id as dosen_id',
                     'tb_dosen.pemilih_id as pemilih_id',
                     'tb_dosen.nama as dosen',
@@ -79,7 +87,6 @@ class dosenService
             // validasi data yang di inputkan di request
             $kondisi = $request->validate([
                 'prodi_id' => 'required|integer',
-                'tipe'     => 'required|string|max:255',
                 'nama'     => 'required|string|max:255',
                 'nip'      => 'required|string|max:255',
                 'email'    => 'required|string|max:255',
@@ -92,7 +99,7 @@ class dosenService
                 $tambah_data_pemilih = DB::table('tb_pemilihan')
                     ->insertGetId([
                         'nama' => $request->nama,
-                        'tipe' => $request->tipe,
+                        'tipe' => "Dosen",
                     ]);
                 $tambah_data_dosen = DB::table('tb_dosen')->insertGetId([
                     'prodi_id'   => $request->prodi_id,

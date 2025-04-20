@@ -1,0 +1,40 @@
+<?php
+namespace App\Http\Controllers;
+
+use App\Services\mahasiswaService;
+use Illuminate\Http\Request;
+
+class mahassiwaController extends Controller
+{
+    // inisial class service mahasiswa
+    public $mahasiswaService;
+
+    public function __construct(mahasiswaService $mahasiswaService)
+    {
+        $this->mahasiswaService = $mahasiswaService;
+    }
+
+    public function getMahasiswa($paginate)
+    {
+        // memanggil fungsi getMahasiswa untuk menampilkan semua data mahasiswa pada class mahasiswaService
+        $respons = $this->mahasiswaService->getMahasiswa($paginate);
+
+        return $respons;
+    }
+
+    public function getMahasiswaById($id)
+    {
+        // memanggil fungsi getMahasiswaById untuk menampilkan data mahasiswa berdasarkan id pada class mahasiswaService
+        $respons = $this->mahasiswaService->getMahasiswaById($id);
+
+        return $respons;
+    }
+
+    public function createMahasiswa(Request $request)
+    {
+        // memanggil fungsi createMahasiswa untuk menambahkan data mahasiswa pada class mahasiswaService
+        $respons = $this->mahasiswaService->createMahasiswa($request);
+
+        return $respons;
+    }
+}

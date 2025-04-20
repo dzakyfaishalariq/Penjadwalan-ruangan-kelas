@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\dosenController;
 use App\Http\Controllers\fakultasController;
+use App\Http\Controllers\mahassiwaController;
 use App\Http\Controllers\pemilihanController;
 use App\Http\Controllers\prodiController;
 use Illuminate\Support\Facades\Route;
@@ -61,3 +62,11 @@ Route::middleware('api')->post('/dosen/add', [dosenController::class, 'createDos
 Route::middleware('api')->put('/dosen/update/{id}', [dosenController::class, 'updateDosen']);
 // rute untuk menghapus data dosen berdasarkan ID
 Route::middleware('api')->delete('/dosen/delete/{id}', [dosenController::class, 'deleteDosen']);
+
+//Ruter User MAHASISWA
+// rute untuk memanggil semua data mahasiswa
+Route::middleware('api')->get('/mahasiswa/{paginate}', [mahassiwaController::class, 'getMahasiswa']);
+// rute untuk memanggil data mahasiswa berdasarkan id mahasiswa
+Route::middleware('api')->get('/mahasiswaById/{id}', [mahassiwaController::class, 'getMahasiswaById']);
+// rute untuk menambahkan data mahasiswa dengan validasi dan paramter inputan POST
+Route::middleware('api')->post('/mahasiswa/add', [mahassiwaController::class, 'createMahasiswa']);
