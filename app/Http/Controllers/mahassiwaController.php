@@ -37,4 +37,20 @@ class mahassiwaController extends Controller
 
         return $respons;
     }
+
+    public function updateMahasiswa(Request $request, $id)
+    {
+        // memanggil fungsi updateMahasiswa untuk mengupdate data mahasiswa pada class mahasiswaService
+        $respons = $this->mahasiswaService->updateMahasiswa($request, $id);
+
+        return $respons;
+    }
+
+    public function deleteMahasiswa($id)
+    {
+        // memanggil fungsi deleteMahasiswa untuk menghapus data mahasiswa pada class mahasiswaService
+        $respons = $this->mahasiswaService->deleteMahasiswa($id);
+
+        return $respons;
+    }
 }

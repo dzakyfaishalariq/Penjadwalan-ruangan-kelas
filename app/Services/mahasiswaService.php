@@ -75,6 +75,7 @@ class mahasiswaService
 
     public function createMahasiswa($request)
     {
+        // memanggil fungsi createMahasiswa untuk menambahkan data mahasiswa
         try {
             $data_validasi = $request->validate([
                 "prodi_id" => "required|integer",
@@ -112,6 +113,85 @@ class mahasiswaService
             }
         } catch (Exception $e) {
             $respons = new Template(false, 'Data Gagal di tambahkan', $e->getMessage());
+            return $respons->response();
+        }
+    }
+    public function updateMahasiswa($request, $id)
+    {
+        // memanggil fungsi updateMahasiswa untuk mengupdate data mahasiswa
+        try {
+            $data_mahasiswa = DB::table('tb_mahasiswa')->where('id', $id)->first();
+            if (! $data_mahasiswa) {
+                $respons = new Template(false, 'Data Gagal di update', 'Data mahasiswa tidak ditemukan');
+                return $respons->response();
+            }
+            $data_validasi = $request->validate([
+                "prodi_id" => "required|integer",
+                "nama"     => "required|string|max:255",
+                "nim"      => "required|string|max:255",
+                "email"    => "required|string|max:255",
+                "username" => "required|string|max:255",
+                "password" => "required|string|min:8|max:255",
+                "role"     => "required|string|max:255",
+            ]);
+            if ($data_validasi) {
+                DB::beginTransaction();
+                $data_pemilihan = DB::table('tb_pemilihan')->where('id', $data_mahasiswa->pemilih_id)->update([
+                    'nama' => $request->nama,
+                    'tipe' => "Mahasiswa",
+                ]);
+                if ($data_pemilihan === 0) {
+                    DB::rollBack();
+                    $respons = new Template(false, 'Data Gagal di update', 'Data pemilihan tidak ditemukan');
+                    return $respons->response();
+                }
+                $data_mahasiswa_update = DB::table('tb_mahasiswa')->where('id', $id)->update([
+                    'prodi_id'   => $request->prodi_id,
+                    'pemilih_id' => $data_mahasiswa->pemilih_id,
+                    'nama'       => $request->nama,
+                    'nim'        => $request->nim,
+                    'email'      => $request->email,
+                    'username'   => $request->username,
+                    'password'   => Hash::make($request->password),
+                    'role'       => $request->role,
+                    'api_key'    => Str::random(60),
+                ]);
+                if ($data_mahasiswa_update === 0) {
+                    DB::rollBack();
+                    $respons = new Template(false, 'Data Gagal di update', 'Data mahasiswa tidak ditemukan');
+                    return $respons->response();
+                }
+                DB::commit();
+                $data_mahasiswa_by_id = DB::table('tb_mahasiswa')->where('id', $id)->first();
+                $respons              = new Template(true, 'Data Berhasil di update', $data_mahasiswa_by_id);
+                return $respons->response();
+            } else {
+                $respons = new Template(false, 'Data Gagal di update', $data_validasi);
+                return $respons->response();
+            }
+        } catch (Exception $e) {
+            $respons = new Template(false, 'Data Gagal di tambahkan', $e->getMessage());
+            return $respons->response();
+        }
+    }
+
+    public function deleteMahasiswa($id)
+    {
+        // 
+        try {
+            $data_mahasiswa = DB::table('tb_mahasiswa')->where('id', $id)->first();
+            if (! $data_mahasiswa) {
+                $respons = new Template(false, 'Data Gagal di hapus', 'Data mahasiswa tidak ditemukan');
+                return $respons->response();
+            }
+            DB::beginTransaction();
+            DB::table('tb_pemilihan')->where('id', $data_mahasiswa->pemilih_id)->delete();
+            DB::table('tb_mahasiswa')->where('id', $id)->delete();
+            DB::commit();
+            $respons = new Template(true, 'Data Berhasil di hapus', $data_mahasiswa);
+            return $respons->response();
+        } catch (Exception $e) {
+            $respons = new Template(false, 'Data Gagal di hapus', $e->getMessage());
             return $respons->response();
         }
     }

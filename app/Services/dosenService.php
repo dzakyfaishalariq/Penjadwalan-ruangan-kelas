@@ -171,6 +171,7 @@ class dosenService
                     'email'      => $request->email,
                     'username'   => $request->username,
                     'password'   => Hash::make($request->password),
+                    'api_key'    => Str::random(60),
                 ]);
                 if ($data_dosen_update === 0) {
                     DB::rollBack();

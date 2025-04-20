@@ -70,3 +70,7 @@ Route::middleware('api')->get('/mahasiswa/{paginate}', [mahassiwaController::cla
 Route::middleware('api')->get('/mahasiswaById/{id}', [mahassiwaController::class, 'getMahasiswaById']);
 // rute untuk menambahkan data mahasiswa dengan validasi dan paramter inputan POST
 Route::middleware('api')->post('/mahasiswa/add', [mahassiwaController::class, 'createMahasiswa']);
+// rute untuk memperbarui data mahasiswa berdasarkan ID
+Route::middleware('api')->put('/mahasiswa/update/{id}', [mahassiwaController::class, 'updateMahasiswa']);
+// rute untuk menghapus data mahasiswa berdasarkan ID
+Route::middleware('api')->delete('/mahasiswa/delete/{id}', [mahassiwaController::class, 'deleteMahasiswa']);
