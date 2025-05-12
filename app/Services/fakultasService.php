@@ -9,8 +9,10 @@ use Illuminate\Validation\ValidationException;
 class fakultasService
 {
     // mengatur logic dari fakultas controller agar tidak terbebani dengan pemanggilan logika yang berhubungan dengan database secara langsung.
-    public function getFakultas($paginate)
+    public function getFakultas(int $paginate = 10)
     {
+        // lakukan pengecekan apakah nilai pagination negatif atau tidak
+        $paginate = $paginate > 0 ? $paginate : 10;
         // ubah variabel paginate ke integer
         try {
             $paginate = (int) $paginate;
@@ -25,7 +27,7 @@ class fakultasService
             return $template_respons->response();
         }
     }
-    public function getFakultasById($id)
+    public function getFakultasById(int $id)
     {
         try {
             // memanggil data fakultas berdasarkan id
@@ -40,8 +42,10 @@ class fakultasService
             return $template_respons->response();
         }
     }
-    public function getFakultasByName($paginate, $name)
+    public function getFakultasByName(int $paginate = 10, string $name)
     {
+        // lakukan pengecekan apakah nilai pagination negatif atau tidak
+        $paginate = $paginate > 0 ? $paginate : 10;
         /**
          * memanggil data fakultas berdasarkan name
          * yang mana param $name dapat disi bebas
@@ -107,7 +111,7 @@ class fakultasService
             return $template_respons->response();
         }
     }
-    public function updateFakultas($request, $id)
+    public function updateFakultas($request, int $id)
     {
         try {
             // melakukan pengecekan parameter nama_fakultas yang wajib di isi dan bertipe string
@@ -170,7 +174,7 @@ class fakultasService
         // melakukan query builder untuk memperbarui data fakultas
 
     }
-    public function deleteFakultas($id)
+    public function deleteFakultas(int $id)
     {
         try {
             if (DB::table('tb_fakultas')->where('id', $id)->first() == null) {

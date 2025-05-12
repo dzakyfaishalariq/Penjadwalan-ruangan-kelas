@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\DB;
 
 class pemilihanService
 {
-    public function getPemilihan($paginate)
+    public function getPemilihan(int $paginate = 10)
     {
+        // cek apakah variabel paginate bernilai lebih dari 0
+        $paginate = $paginate > 0 ? $paginate : 10;
         try {
             // mengambil data tabel pemilihan dan menampilkan nya dengan batasan paginate
             $data_pemiliha = DB::table('tb_pemilihan')
@@ -20,7 +22,7 @@ class pemilihanService
             return $respons->response();
         }
     }
-    public function getPemilihanById($id)
+    public function getPemilihanById(int $id)
     {
         try {
             // melakukan pengecekan id pemilihan apabila ada atau tidak
@@ -69,7 +71,7 @@ class pemilihanService
             return $respons->response();
         }
     }
-    public function updatePemilihan($request, $id)
+    public function updatePemilihan($request, int $id)
     {
         try {
             // melakukan pengecekan id pemilihan apabila ada atau tidak
@@ -106,7 +108,7 @@ class pemilihanService
             return $respons->response();
         }
     }
-    public function deletePemilihan($id)
+    public function deletePemilihan(int $id)
     {
         try {
             // melakukan pengecekan id pemilihan apabila ada atau tidak
@@ -122,5 +124,5 @@ class pemilihanService
             $respons = new Template(false, 'Data Gagal di hapus', $e->getMessage());
             return $respons->response();
         }
-    }   
+    }
 }

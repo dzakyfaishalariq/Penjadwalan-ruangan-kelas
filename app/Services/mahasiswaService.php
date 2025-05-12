@@ -9,8 +9,10 @@ use Illuminate\Support\Str;
 
 class mahasiswaService
 {
-    public function getMahasiswa($paginate)
+    public function getMahasiswa(int $paginate = 10)
     {
+        // mengecek apakah $paginate bernilai lebih dari 0
+        $paginate = $paginate > 0 ? $paginate : 10;
         // mengambil semua data mahasiswa
         try {
             $data_mahasiswa = DB::table('tb_mahasiswa')
@@ -40,7 +42,7 @@ class mahasiswaService
             return $respons->response();
         }
     }
-    public function getMahasiswaById($id)
+    public function getMahasiswaById(int $id)
     {
         // mengambil data mahasiswa berdasarkan ID mahasiswa
         try {
@@ -116,7 +118,7 @@ class mahasiswaService
             return $respons->response();
         }
     }
-    public function updateMahasiswa($request, $id)
+    public function updateMahasiswa($request, int $id)
     {
         // memanggil fungsi updateMahasiswa untuk mengupdate data mahasiswa
         try {
@@ -175,9 +177,9 @@ class mahasiswaService
         }
     }
 
-    public function deleteMahasiswa($id)
+    public function deleteMahasiswa(int $id)
     {
-        // 
+        // memanggil fungsi deleteMahasiswa untuk menghapus data mahasiswa
         try {
             $data_mahasiswa = DB::table('tb_mahasiswa')->where('id', $id)->first();
             if (! $data_mahasiswa) {

@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\DB;
  */
 class prodiService
 {
-    public function getProdi($paginate)
+    public function getProdi(int $paginate = 10)
     {
+        // lakukan pengecekan apakah nilai pagination negatif atau tidak
+        $paginate = $paginate > 0 ? $paginate : 10;
         try {
             // ubah variabel paginate ke integer
             $paginate = (int) $paginate;
@@ -26,8 +28,10 @@ class prodiService
             return $respons->response();
         }
     }
-    public function getProdiToFakultas($paginate)
+    public function getProdiToFakultas(int $paginate = 10)
     {
+        // lakukan pengecekan apakah nilai pagination negatif atau tidak
+        $paginate = $paginate > 0 ? $paginate : 10;
         try {
             // ubah variabel paginate ke integer
             $paginate = (int) $paginate;
@@ -47,11 +51,13 @@ class prodiService
         }
     }
 
-    public function getFakultasToProdi($paginate)
+    public function getFakultasToProdi(int $paginate = 10)
     {
         try {
             // ubah variabel paginate ke integer
             $paginate = (int) $paginate;
+            // lakukan pengecekan apakah nilai paginate bernilai > 0
+            $paginate = $paginate > 0 ? $paginate : 10;
             // memanggil semua data fakultas dengan relasi pada table prodi yang mana tiap fakultas akan menampilkan data prodi di dalamnya
             $data_fakultas_to_prodi = DB::table('tb_fakultas')
                 ->leftJoin('tb_prodi', 'tb_fakultas.id', '=', 'tb_prodi.fakultas_id')
@@ -68,7 +74,7 @@ class prodiService
         }
     }
 
-    public function getProdiById($id)
+    public function getProdiById(int $id)
     {
         // memanggil data prodi berdasarkan id prodi yang mana data dalam prodi dapat berelasi pada table fakultas dan data fakultas dapat di panggil ke dalam data prodi
         $data_prodi = DB::table('tb_prodi')
@@ -97,8 +103,10 @@ class prodiService
         $respons = new Template(true, 'Data Berhasil di ambil', $data);
         return $respons->response();
     }
-    public function getProdiByName($paginate, $name)
+    public function getProdiByName(int $paginate = 10, string $name)
     {
+        // lakukan pengecekan apakah nilai pagination negatif atau tidak
+        $paginate = $paginate > 0 ? $paginate : 10;
         try {
             // ubah variabel paginate ke integer
             $paginate = (int) $paginate;
@@ -154,7 +162,7 @@ class prodiService
             return $respons->response();
         }
     }
-    public function updateProdi($request, $id)
+    public function updateProdi($request, int $id)
     {
         try {
             // validasi data yang dikirim teridiri dari tiga parameter yang mana dua dari varieabel request dan id (integer)
@@ -190,7 +198,7 @@ class prodiService
             return $respons->response();
         }
     }
-    public function deleteProdi($id)
+    public function deleteProdi(int $id)
     {
         try {
             // jika id tidak ditemukan maka akan mengembalikan response json dengan pesan error

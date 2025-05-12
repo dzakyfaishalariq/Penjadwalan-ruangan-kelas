@@ -9,14 +9,17 @@ use Illuminate\Support\Str;
 
 class dosenService
 {
-    public function getDosen($paginate)
+    public function getDosen(int $paginate = 10)
     {
+        // lakukan pengecekan apakah nilai pagination negatif atau tidak
+        $paginate = $paginate > 0 ? $paginate : 10;
         try {
             // mengambil semua data dosen dengan relasi pada table prodi
             $data_dosen = DB::table('tb_dosen')
                 ->join("tb_prodi", "tb_dosen.prodi_id", "=", "tb_prodi.id")
                 ->join("tb_pemilihan", "tb_dosen.pemilih_id", "=", "tb_pemilihan.id")
                 ->select(
+                    'tb_dosen.id as dosen_id',
                     'tb_prodi.id as prodi_id',
                     'tb_prodi.fakultas_id as fakultas_id',
                     'tb_prodi.nama_prodi as prodi',
@@ -44,7 +47,7 @@ class dosenService
             return $respons->response();
         }
     }
-    public function getDosenById($id)
+    public function getDosenById(int $id)
     {
         try {
             // mengambil data dosen berdasarkan ID dosen
@@ -130,7 +133,7 @@ class dosenService
             return $respons->response();
         }
     }
-    public function updateDosen($request, $id)
+    public function updateDosen($request, int $id)
     {
         // fungsi untuk mengupdate data dosen
         try {
@@ -198,7 +201,7 @@ class dosenService
         }
     }
 
-    public function deleteDosen($id)
+    public function deleteDosen(int $id)
     {
         // fungsi untuk menghapus data dosen
         try {

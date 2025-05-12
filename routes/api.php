@@ -5,6 +5,7 @@ use App\Http\Controllers\fakultasController;
 use App\Http\Controllers\mahassiwaController;
 use App\Http\Controllers\pemilihanController;
 use App\Http\Controllers\prodiController;
+use App\Http\Controllers\ruaganController;
 use Illuminate\Support\Facades\Route;
 
 // ROUTER FAKULTAS
@@ -74,3 +75,7 @@ Route::middleware('api')->post('/mahasiswa/add', [mahassiwaController::class, 'c
 Route::middleware('api')->put('/mahasiswa/update/{id}', [mahassiwaController::class, 'updateMahasiswa']);
 // rute untuk menghapus data mahasiswa berdasarkan ID
 Route::middleware('api')->delete('/mahasiswa/delete/{id}', [mahassiwaController::class, 'deleteMahasiswa']);
+
+// Router RUANGAN
+// rute untuk memanggil semua data ruangan
+Route::middleware('api')->get('/ruangan/{paginate}', [ruaganController::class, 'getRuangan']);
