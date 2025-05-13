@@ -79,3 +79,11 @@ Route::middleware('api')->delete('/mahasiswa/delete/{id}', [mahassiwaController:
 // Router RUANGAN
 // rute untuk memanggil semua data ruangan
 Route::middleware('api')->get('/ruangan/{paginate}', [ruaganController::class, 'getRuangan']);
+// rute untuk memanggil data ruangan berdasarkan id ruangan
+Route::middleware('api')->get('/ruanganById/{id}', [ruaganController::class, 'getRuanganById']);
+// rute update data ruangan berdasarkan id ruangan
+Route::middleware('api')->put('/ruangan/update/{id}', [ruaganController::class, 'updateRuangan']);
+// rute create data ruangan
+Route::middleware('api')->post('/ruangan/add', [ruaganController::class, 'createRuangan']);
+// rute delete data ruangan berdasarkan id ruangan
+Route::middleware('api')->delete('/ruangan/delete/{id}', [ruaganController::class, 'deleteRuangan']);

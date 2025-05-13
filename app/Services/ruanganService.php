@@ -40,4 +40,123 @@ class ruanganService
             return $respons->response();
         }
     }
+    public function getRuanganById(int $id)
+    {
+        // validasi id tidak boleh kurang dari 0
+        $id = $id > 0 ? $id : 0;
+        try {
+            // buat array select data
+            $select_data = [
+                'tr.prodi_id',
+                'tp.nama_prodi',
+                'tr.id as ruangan_id',
+                'tr.nama_ruangan',
+                'tr.kapasitas',
+                'tr.status',
+            ];
+            //cek apakah id tidak ditemukan
+            $data = DB::table('tb_ruangan')->where('id', $id)->first();
+            if ($data == null) {
+                $respons = new Template(false, 'Data Gagal di ambil', 'Data tidak ditemukan');
+                return $respons->response();
+            }
+            // memanggil data ruangan berdasarkan id
+            $data_ruangan = DB::table('tb_ruangan as tr')
+                ->join('tb_prodi as tp', 'tr.prodi_id', '=', 'tp.id')
+                ->select($select_data)
+                ->where('tr.id', $id)
+                ->first();
+            // mengembalikan response json
+            $respons = new Template(true, 'Data Berhasil di ambil', $data_ruangan);
+            return $respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
+    public function updateRuangan($request, int $id)
+    {
+        try {
+            // validasi id tidak boleh kurang dari 0
+            $id = $id > 0 ? $id : 0;
+            // validasi data yang dikirim terdiri dari 4 parameter
+            $kondisi = $request->validate([
+                'prodi_id'     => 'required|integer',
+                'nama_ruangan' => 'required|string|max:255',
+                'kapasitas'    => 'required|integer',
+                'status'       => 'required|boolean',
+            ]);
+            if ($kondisi) {
+                DB::beginTransaction();
+                $update_data_ruangan = DB::table('tb_ruangan')
+                    ->where('id', $id)
+                    ->update($request->all());
+                if ($update_data_ruangan === 0) {
+                    DB::rollBack();
+                    $respons = new Template(false, 'Data Gagal di update', 'Data tidak ditemukan');
+                    return $respons->response();
+                }
+                DB::commit();
+                $data_ruangan = DB::table('tb_ruangan')->where('id', $id)->first();
+                $respons      = new Template(true, 'Data Berhasil di update', $data_ruangan);
+                return $respons->response();
+            }
+        } catch (Exception $e) {
+            //throw $e;
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
+    public function createRuangan($request)
+    {
+        try {
+            $kondisi = $request->validate([
+                'prodi_id'     => 'required|integer',
+                'nama_ruangan' => 'required|string|max:255',
+                'kapasitas'    => 'required|integer',
+                'status'       => 'required|boolean',
+            ]);
+            if ($kondisi) {
+                DB::beginTransaction();
+                $tambah_data = DB::table('tb_ruangan')->insertGetId($request->all());
+                DB::commit();
+                $data_ruangan_tambah = DB::table('tb_ruangan')->where('id', $tambah_data)->first();
+                $respons             = new Template(true, 'Data Berhasil di tambahkan', $data_ruangan_tambah);
+                return $respons->response();
+            } else {
+                $respons = new Template(false, 'Data Gagal di tambahkan', $kondisi);
+                return $respons->response();
+            }
+        } catch (Exception $e) {
+            //throw $e;
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
+    public function deleteRuangan(int $id)
+    {
+        try {
+            // jika id tidak ditemukan maka akan mengembalikan response json dengan pesan error
+            $id   = (int) $id;
+            $id   = $id > 0 ? $id : 0;
+            $data = DB::table('tb_ruangan')->where('id', $id)->first();
+            if ($data == null) {
+                $respons = new Template(false, 'Data Gagal di hapus', 'Data tidak ditemukan');
+                return $respons->response();
+            }
+            // menghapus data prodi berdasarkan id
+            DB::table('tb_ruangan')->where('id', $id)->delete();
+            // mengembalikan response json
+            $respons = new Template(true, 'Data Berhasil di hapus', $data);
+            return $respons->response();
+        } catch (Exception $e) {
+            //throw $e;
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di hapus', $e->getMessage());
+            return $respons->response();
+        }
+    }
 }
