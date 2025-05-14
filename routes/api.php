@@ -97,6 +97,6 @@ Route::middleware('api')->get('/matkulById/{id}', [matakuliahController::class, 
 // rute update data matkul berdasarkan id matkul
 Route::middleware('api')->put('/matkul/update/{id}', [matakuliahController::class, 'updateMatkul']);
 // rute create data matkul
-Route::middleware('api')->post('/matkul/add', [matakuliahController::class, 'createMatkul']);
+Route::middleware('api')->post('/matkul/add', [matakuliahController::class, 'addMatkul']);
 // rute delete data matkul berdasarkan id matkul
 Route::middleware('api')->delete('/matkul/delete/{id}', [matakuliahController::class, 'deleteMatkul']);
