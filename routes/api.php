@@ -3,6 +3,7 @@
 use App\Http\Controllers\dosenController;
 use App\Http\Controllers\fakultasController;
 use App\Http\Controllers\mahassiwaController;
+use App\Http\Controllers\matakuliahController;
 use App\Http\Controllers\pemilihanController;
 use App\Http\Controllers\prodiController;
 use App\Http\Controllers\ruaganController;
@@ -87,3 +88,15 @@ Route::middleware('api')->put('/ruangan/update/{id}', [ruaganController::class, 
 Route::middleware('api')->post('/ruangan/add', [ruaganController::class, 'createRuangan']);
 // rute delete data ruangan berdasarkan id ruangan
 Route::middleware('api')->delete('/ruangan/delete/{id}', [ruaganController::class, 'deleteRuangan']);
+
+// Router MATAKULIAH
+// rute untuk memanggil semua data matkul
+Route::middleware('api')->get('/matkul/{paginate}', [matakuliahController::class, 'getMatkul']);
+// rute untuk memanggil data matkul berdasarkan id matkul
+Route::middleware('api')->get('/matkulById/{id}', [matakuliahController::class, 'getMatkulById']);
+// rute update data matkul berdasarkan id matkul
+Route::middleware('api')->put('/matkul/update/{id}', [matakuliahController::class, 'updateMatkul']);
+// rute create data matkul
+Route::middleware('api')->post('/matkul/add', [matakuliahController::class, 'createMatkul']);
+// rute delete data matkul berdasarkan id matkul
+Route::middleware('api')->delete('/matkul/delete/{id}', [matakuliahController::class, 'deleteMatkul']);
