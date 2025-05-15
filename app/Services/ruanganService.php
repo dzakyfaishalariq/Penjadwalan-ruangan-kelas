@@ -159,4 +159,18 @@ class ruanganService
             return $respons->response();
         }
     }
+    public function totalRuangan()
+    {
+        try {
+            // menghitung total prodi
+            $data = DB::table('tb_ruangan')->count();
+            // mengembalikan response json apabila berhasil menampilkan jumlah data prodi
+            $respons = new Template(true, 'Total Berhasil di ambil', $data);
+            return $respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\dosenController;
 use App\Http\Controllers\fakultasController;
+use App\Http\Controllers\jadwalMatakuliahController;
 use App\Http\Controllers\mahassiwaController;
 use App\Http\Controllers\matakuliahController;
 use App\Http\Controllers\pemilihanController;
@@ -22,6 +23,8 @@ Route::middleware('api')->post('/fakultas/add', [fakultasController::class, 'cre
 Route::middleware('api')->put('/fakultas/update/{id}', [fakultasController::class, 'updateFakultas']);
 // rute untuk menghapus data fakultas berdasarkan ID
 Route::middleware('api')->delete('/fakultas/delete/{id}', [fakultasController::class, 'deleteFakultas']);
+// rute untuk melihat total fakultas
+Route::middleware('api')->get('/total/fakultas', [fakultasController::class, 'jumlahFakultas']);
 
 // ROUTER PRODI
 // rute untuk memanggil semua data prodi
@@ -40,6 +43,8 @@ Route::middleware('api')->post('/prodi/add', [prodiController::class, 'createPro
 Route::middleware('api')->put('/prodi/update/{id}', [prodiController::class, 'updateProdi']);
 // rute untuk menghapus data prodi berdasarkan ID
 Route::middleware('api')->delete('/prodi/delete/{id}', [prodiController::class, 'deleteProdi']);
+// rute untuk melihat total prodi
+Route::middleware('api')->get('/total/prodi', [prodiController::class, 'totalProdi']);
 
 // ROUTER PEMILIHAN
 // rute untuk memanggil semua data pemilihan
@@ -64,6 +69,8 @@ Route::middleware('api')->post('/dosen/add', [dosenController::class, 'createDos
 Route::middleware('api')->put('/dosen/update/{id}', [dosenController::class, 'updateDosen']);
 // rute untuk menghapus data dosen berdasarkan ID
 Route::middleware('api')->delete('/dosen/delete/{id}', [dosenController::class, 'deleteDosen']);
+// rute untuk melihat total dosen
+Route::middleware('api')->get('/total/dosen', [dosenController::class, 'totalDosen']);
 
 //Ruter User MAHASISWA
 // rute untuk memanggil semua data mahasiswa
@@ -76,6 +83,8 @@ Route::middleware('api')->post('/mahasiswa/add', [mahassiwaController::class, 'c
 Route::middleware('api')->put('/mahasiswa/update/{id}', [mahassiwaController::class, 'updateMahasiswa']);
 // rute untuk menghapus data mahasiswa berdasarkan ID
 Route::middleware('api')->delete('/mahasiswa/delete/{id}', [mahassiwaController::class, 'deleteMahasiswa']);
+// rute untuk melihat total mahasiswa
+Route::middleware('api')->get('/total/mahasiswa', [mahassiwaController::class, 'totalMahasiswa']);
 
 // Router RUANGAN
 // rute untuk memanggil semua data ruangan
@@ -88,6 +97,8 @@ Route::middleware('api')->put('/ruangan/update/{id}', [ruaganController::class, 
 Route::middleware('api')->post('/ruangan/add', [ruaganController::class, 'createRuangan']);
 // rute delete data ruangan berdasarkan id ruangan
 Route::middleware('api')->delete('/ruangan/delete/{id}', [ruaganController::class, 'deleteRuangan']);
+// rute untuk melihat total ruangan
+Route::middleware('api')->get('/total/ruangan', [ruaganController::class, 'totalRuangan']);
 
 // Router MATAKULIAH
 // rute untuk memanggil semua data matkul
@@ -100,3 +111,9 @@ Route::middleware('api')->put('/matkul/update/{id}', [matakuliahController::clas
 Route::middleware('api')->post('/matkul/add', [matakuliahController::class, 'addMatkul']);
 // rute delete data matkul berdasarkan id matkul
 Route::middleware('api')->delete('/matkul/delete/{id}', [matakuliahController::class, 'deleteMatkul']);
+// rute untuk melihat total matkul
+Route::middleware('api')->get('/total/matkul', [matakuliahController::class, 'totalMatkul']);
+
+// Route JADWAL MATAKULIAH
+// rute untuk memanggil semua data jadwal matkul
+Route::middleware('api')->get('/jadwal/{paginate}', [jadwalMatakuliahController::class, 'getJadwalMatakuliah']);

@@ -148,8 +148,8 @@ class fakultasService
             if ($update_data === 0) {
                 DB::rollBack();
                 $respon = [
-                    'message' => 'Fakultas gagal di perbarui',
-                    'errors'  => 'Data dengan id ' . $id . ' tidak ditemukan',
+                    'message' => 'Fakultas gagal di perbarui atau diubah',
+                    'errors'  => 'Data dengan id ' . $id . ' tidak ditemukan atau data sudah ada yang sama',
                 ];
                 $template_respons = new Template(false, 'Data Gagal di kirimkan', $respon);
                 return $template_respons->response();
@@ -203,6 +203,20 @@ class fakultasService
             ];
             $template_respons = new Template(false, 'Data Gagal di kirimkan', $data);
             return $template_respons->response();
+        }
+    }
+    public function jumlahFakultas()
+    {
+        try {
+            // menghitung total fakultas
+            $data = DB::table('tb_fakultas')->count();
+            // mengembalikan response json apabila berhasil menampilkan jumlah data fakultas
+            $respons = new Template(true, 'Total Berhasil di ambil', $data);
+            return $respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
         }
     }
 }

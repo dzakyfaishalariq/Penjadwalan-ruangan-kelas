@@ -84,4 +84,12 @@ class prodiController extends Controller
 
         return $prodi_delete;
     }
+
+    public function totalProdi()
+    {
+        // memanggil fungsi untuk menghitung total prodi
+        $total_prodi = $this->prodiService->totalProdi();
+
+        return $total_prodi;
+    }
 }

@@ -48,4 +48,11 @@ class dosenController extends Controller
 
         return $respons;
     }
+
+    public function totalDosen()
+    {
+        $respons = $this->dosenService->totalDosen();
+
+        return $respons;
+    }
 }

@@ -148,7 +148,7 @@ class dosenService
                 'prodi_id' => 'required|integer',
                 'tipe'     => 'required|string|max:255',
                 'nama'     => 'required|string|max:255',
-                'nip'      => 'required|string|max:255',
+                'nip'      => 'required|string|max:255|regex:/^[A-Za-z0-9]+$/',
                 'email'    => 'required|string|max:255',
                 'username' => 'required|string|max:255',
                 'password' => 'required|string|min:8|max:255',
@@ -216,6 +216,21 @@ class dosenService
             DB::table('tb_dosen')->where('id', $id)->delete();
             DB::commit();
             $respons = new Template(true, 'Data Berhasil di delete', $data_dosen);
+            return $respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
+
+    public function totalDosen()
+    {
+        try {
+            // menghitung total dosen
+            $data    = DB::table('tb_dosen')->count();
+            // mengembalikan response json apabila berhasil menampilkan jumlah data dosen
+            $respons = new Template(true, 'Total Berhasil di ambil', $data);
             return $respons->response();
         } catch (Exception $e) {
             // mengembalikan response json apabila terjadi error

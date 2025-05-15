@@ -23,7 +23,7 @@ class Template
                 'status'  => $this->status,
                 'message' => $this->message,
                 'data'    => $this->data,
-            ]);
+            ], 200);
         } else {
             return response()->json([
                 'status'  => $this->status,

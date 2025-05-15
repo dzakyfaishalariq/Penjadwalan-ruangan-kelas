@@ -130,7 +130,7 @@ class mahasiswaService
             $data_validasi = $request->validate([
                 "prodi_id" => "required|integer",
                 "nama"     => "required|string|max:255",
-                "nim"      => "required|string|max:255",
+                "nim"      => "required|string|max:255|regex:/^[A-Za-z0-9]+$/",
                 "email"    => "required|string|max:255",
                 "username" => "required|string|max:255",
                 "password" => "required|string|min:8|max:255",
@@ -194,6 +194,20 @@ class mahasiswaService
             return $respons->response();
         } catch (Exception $e) {
             $respons = new Template(false, 'Data Gagal di hapus', $e->getMessage());
+            return $respons->response();
+        }
+    }
+    public function totalMahasiswa()
+    {
+        try {
+            // menghitung total mahasiswa
+            $data = DB::table('tb_mahasiswa')->count();
+            // mengembalikan response json apabila berhasil menampilkan jumlah data mahasiswa
+            $respons = new Template(true, 'Total Berhasil di ambil', $data);
+            return $respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
             return $respons->response();
         }
     }

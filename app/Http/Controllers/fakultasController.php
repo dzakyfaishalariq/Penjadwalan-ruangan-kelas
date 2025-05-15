@@ -56,4 +56,12 @@ class fakultasController extends Controller
 
         return $fakultas;
     }
+
+    // memanggil fungsi untuk menghitung total fakultas
+    public function jumlahFakultas()
+    {
+        $fakultas = $this->fakultasService->jumlahFakultas();
+
+        return $fakultas;
+    }
 }

@@ -53,4 +53,12 @@ class mahassiwaController extends Controller
 
         return $respons;
     }
+
+    public function totalMahasiswa()
+    {
+        // memanggil fungsi totalMahasiswa untuk menampilkan jumlah data mahasiswa pada class mahasiswaService
+        $respons = $this->mahasiswaService->totalMahasiswa();
+
+        return $respons;
+    }
 }

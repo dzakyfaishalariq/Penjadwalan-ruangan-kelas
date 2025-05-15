@@ -41,4 +41,10 @@ class matakuliahController extends Controller
         $matakuliah = $this->matakuliahService->deleteMatkul($id);
         return $matakuliah;
     }
+
+    public function totalMatkul()
+    {
+        $matakuliah = $this->matakuliahService->totalMatkul();
+        return $matakuliah;
+    }
 }
