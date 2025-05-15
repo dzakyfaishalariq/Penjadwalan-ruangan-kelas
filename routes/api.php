@@ -117,3 +117,13 @@ Route::middleware('api')->get('/total/matkul', [matakuliahController::class, 'to
 // Route JADWAL MATAKULIAH
 // rute untuk memanggil semua data jadwal matkul
 Route::middleware('api')->get('/jadwal/{paginate}', [jadwalMatakuliahController::class, 'getJadwalMatakuliah']);
+// rute untuk memanggil data jadwal matkul berdasarkan id jadwal matkul
+Route::middleware('api')->get('/jadwalById/{id}', [jadwalMatakuliahController::class, 'getJadwalMatakuliahById']);
+// rute update data jadwal matkul berdasarkan id jadwal matkul
+Route::middleware('api')->put('/jadwal/update/{id}', [jadwalMatakuliahController::class, 'updateJadwalMatakuliah']);
+// rute create data jadwal matkul
+Route::middleware('api')->post('/jadwal/add', [jadwalMatakuliahController::class, 'createJadwalMatakuliah']);
+// rute delete data jadwal matkul berdasarkan id jadwal matkul
+Route::middleware('api')->delete('/jadwal/delete/{id}', [jadwalMatakuliahController::class, 'deleteJadwalMatakuliah']);
+// rute untuk melihat total jadwal matkul
+Route::middleware('api')->get('/total/jadwal', [jadwalMatakuliahController::class, 'totalJadwalMatakuliah']);
