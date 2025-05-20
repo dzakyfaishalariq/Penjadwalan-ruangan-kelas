@@ -6,6 +6,7 @@ use App\Http\Controllers\jadwalMatakuliahController;
 use App\Http\Controllers\mahassiwaController;
 use App\Http\Controllers\matakuliahController;
 use App\Http\Controllers\pemilihanController;
+use App\Http\Controllers\pemilihanRuangaController;
 use App\Http\Controllers\prodiController;
 use App\Http\Controllers\ruaganController;
 use Illuminate\Support\Facades\Route;
@@ -127,3 +128,7 @@ Route::middleware('api')->post('/jadwal/add', [jadwalMatakuliahController::class
 Route::middleware('api')->delete('/jadwal/delete/{id}', [jadwalMatakuliahController::class, 'deleteJadwalMatakuliah']);
 // rute untuk melihat total jadwal matkul
 Route::middleware('api')->get('/total/jadwal', [jadwalMatakuliahController::class, 'totalJadwalMatakuliah']);
+
+// Route PEMILIHAN RUANGAN
+// rute untuk memanggil semua data pemilihan ruangan
+Route::middleware('api')->get('/pemilihanRuangan/{paginate}', [pemilihanRuangaController::class, 'getPemilihanRuangan']);
