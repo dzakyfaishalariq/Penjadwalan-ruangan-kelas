@@ -152,13 +152,29 @@ class jadwalMatakuliahSevice
         $id = $id > 0 ? $id : 0;
         try {
             // cek apakah data jadwal matakuliah ada
-            $data_jadwal_matakuliah = DB::table('tb_jadwal_matakuliah')->where('id', '=', $id)->first();
-            if (! $data_jadwal_matakuliah) {
+            $data_jadwal_matakuliah = DB::table('tb_jadwal_matakuliah')->where('id', $id)->exists();
+            if (!$data_jadwal_matakuliah) {
                 $response = new Template(false, 'Data Gagal di hapus', 'Data jadwal matakuliah tidak ditemukan');
                 return $response->response();
             }
             // melakukan delete data jadwal matakuliah
-            DB::table('tb_jadwal_matakuliah')->where('id', '=', $id)->delete();
+            DB::beginTransaction();
+            // tahapan menghapus data jadwal matakuliah
+            // ambil data id jadwal matakuliah
+            $jadwalMatakuliahIds = DB::table('tb_jadwal_matakuliah')->where('id', $id)->pluck('id');
+            if ($jadwalMatakuliahIds->isNotEmpty()) {
+                // ambil data id pemilihan ruangan
+                $pemilihanRuanganIds = DB::table('tb_pemilihan_ruangan')->whereIn('jadwal_id', $jadwalMatakuliahIds)->pluck('id');
+                if ($pemilihanRuanganIds->isNotEmpty()) {
+                    // hapus data kalender sistem
+                    DB::table('tb_kalender_sistem')->whereIn('pemilihan_ruangan_id', $pemilihanRuanganIds)->delete();
+                }
+                // hapus data pemilihan ruangan
+                DB::table('tb_pemilihan_ruangan')->whereIn('jadwal_id', $jadwalMatakuliahIds)->delete();
+                // hapus data jadwal matakuliah
+                DB::table('tb_jadwal_matakuliah')->whereIn('id', $jadwalMatakuliahIds)->delete();
+            }
+            DB::commit();
             // mengembalikan response json apabila data jadwal matakuliah berhasil di hapus
             $response = new Template(true, 'Data Berhasil di hapus', $data_jadwal_matakuliah);
             return $response->response();

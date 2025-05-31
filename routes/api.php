@@ -132,3 +132,11 @@ Route::middleware('api')->get('/total/jadwal', [jadwalMatakuliahController::clas
 // Route PEMILIHAN RUANGAN
 // rute untuk memanggil semua data pemilihan ruangan
 Route::middleware('api')->get('/pemilihanRuangan/{paginate}', [pemilihanRuangaController::class, 'getPemilihanRuangan']);
+// rute untuk memanggil data pemilihan ruangan berdasarkan id pemilihan ruangan
+Route::middleware('api')->get('/pemilihanRuanganById/{id}', [pemilihanRuangaController::class, 'getPemilihanRuanganById']);
+// rute update data pemilihan ruangan berdasarkan id pemilihan ruangan
+Route::middleware('api')->put('/pemilihanRuangan/update/{id}', [pemilihanRuangaController::class, 'updatePemilihanRungan']);
+// rute create data pemilihan ruangan
+Route::middleware('api')->post('/pemilihanRuangan/add', [pemilihanRuangaController::class, 'addPemilihanRungan']);
+// rute delete data pemilihan ruangan berdasarkan id pemilihan ruangan
+Route::middleware('api')->delete('/pemilihanRuangan/delete/{id}', [pemilihanRuangaController::class, 'deletePemilihanRuangan']);

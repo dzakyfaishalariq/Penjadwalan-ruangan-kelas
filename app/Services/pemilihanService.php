@@ -112,12 +112,50 @@ class pemilihanService
     {
         try {
             // melakukan pengecekan id pemilihan apabila ada atau tidak
-            if (DB::table('tb_pemilihan')->where('id', $id)->first() == null) {
+            if (! DB::table('tb_pemilihan')->where('id', $id)->exists()) {
                 $respons = new Template(false, 'Data Gagal di hapus', 'Data pemilihan tidak ditemukan');
                 return $respons->response();
             }
             // menghapus data pemilihan berdasarkan id
-            DB::table('tb_pemilihan')->where('id', $id)->delete();
+            DB::beginTransaction();
+            // tahapan menghapus data pemilihan
+            // ambil semua data id pemilihan
+            $pemilihanIds = DB::table('tb_pemilihan')->where('id', $id)->pluck('id');
+            if ($pemilihanIds->isNotEmpty()) {
+                // ambil semua data id pemilihan ruangan
+                $pemilihanRuanganIds = DB::table('tb_pemilihan_ruangan')->whereIn('pemilih_id', $pemilihanIds)->pluck('id');
+                if ($pemilihanRuanganIds->isNotEmpty()) {
+                    // hapus data kalender sistem berdasarkan id dari pemilihan ruangan
+                    DB::table('tb_kalender_sistem')->whereIn('pemilihan_ruangan_id', $pemilihanRuanganIds)->delete();
+                }
+                // hapus data pemilihan ruangan
+                DB::table('tb_pemilihan_ruangan')->whereIn('pemilih_id', $pemilihanIds)->delete();
+                // ambil semua data id dosen
+                $dosenIds = DB::table('tb_dosen')->whereIn('pemilih_id', $pemilihanIds)->pluck('id');
+                if ($dosenIds->isNotEmpty()) {
+                    // ambil data jadwal matakuliah
+                    $jadwalMatakuliahIds = DB::table('tb_jadwal_matakuliah')->whereIn('dosen_id', $dosenIds)->pluck('id');
+                    if ($jadwalMatakuliahIds->isNotEmpty()) {
+                        // ambil data pemilihan ruangan
+                        $pemilihanRuanganIds = DB::table('tb_pemilihan_ruangan')->whereIn('jadwal_id', $jadwalMatakuliahIds)->pluck('id');
+                        if ($pemilihanRuanganIds->isNotEmpty()) {
+                            // hapus data kalender sistem berdasarkan id dari pemilihan ruangan
+                            DB::table('tb_kalender_sistem')->whereIn('pemilihan_ruangan_id', $pemilihanRuanganIds)->delete();
+                        }
+                        // hapus data pemilihan ruangan
+                        DB::table('tb_pemilihan_ruangan')->whereIn('jadwal_id', $jadwalMatakuliahIds)->delete();
+                        // hapus data jadwal matakuliah
+                        DB::table('tb_jadwal_matakuliah')->whereIn('dosen_id', $dosenIds)->delete();
+                    }
+                    // hapus data dosen
+                    DB::table('tb_dosen')->whereIn('id', $dosenIds)->delete();
+                }
+                // hapus data mahasiswa
+                DB::table('tb_mahasiswa')->whereIn('pemilih_id', $pemilihanIds)->delete();
+                // hapus data pemilihan
+                DB::table('tb_pemilihan')->whereIn('id', $pemilihanIds)->delete();
+            }
+            DB::commit();
             $respons = new Template(true, 'Data Berhasil di hapus', null);
             return $respons->response();
         } catch (Exception $e) {

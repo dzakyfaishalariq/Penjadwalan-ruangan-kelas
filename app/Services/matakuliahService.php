@@ -158,7 +158,29 @@ class matakuliahService
                 return $respons->response();
             }
             // menghapus data matakuliah.
-            DB::table('tb_matakuliah')->where('id', $id)->delete();
+            DB::beginTransaction();
+            // tahapan menghapus data matakuliah
+            // ambil data id matakuliah
+            $matakuliahIds = DB::table('tb_matakuliah')->where('id', $id)->pluck('id');
+            if ($matakuliahIds->isNotEmpty()) {
+                // ambil data id jadwal matakuliah
+                $jadwalMatakuliahIds = DB::table('tb_jadwal_matakuliah')->whereIn('matakuliah_id', $matakuliahIds)->pluck('id');
+                if ($jadwalMatakuliahIds->isNotEmpty()) {
+                    // ambil data id pemilihan ruangan
+                    $pemilihanRuanganIds = DB::table('tb_pemilihan_ruangan')->whereIn('jadwal_id', $jadwalMatakuliahIds)->pluck('id');
+                    if ($pemilihanRuanganIds->isNotEmpty()) {
+                        // hapus data kalender sistem
+                        DB::table('tb_kalender_sistem')->whereIn('pemilihan_ruangan_id', $pemilihanRuanganIds)->delete();
+                    }
+                    // hapus data pemilihan ruangan
+                    DB::table('tb_pemilihan_ruangan')->whereIn('jadwal_id', $jadwalMatakuliahIds)->delete();
+                }
+                // hapus data jadwal matakuliah
+                DB::table('tb_jadwal_matakuliah')->whereIn('matakuliah_id', $matakuliahIds)->delete();
+                // hapus data matakuliah
+                DB::table('tb_matakuliah')->whereIn('id', $matakuliahIds)->delete();
+            }
+            DB::commit();
             // kembalikan response json data yang sudah di hapus.
             $respons = new Template(true, 'Data Berhasil di hapus', $data_matakuliah);
             return $respons->response();
@@ -169,7 +191,8 @@ class matakuliahService
         }
     }
 
-    public function totalMatkul(){
+    public function totalMatkul()
+    {
         try {
             // menghitung total prodi
             $data = DB::table('tb_matakuliah')->count();

@@ -187,7 +187,93 @@ class fakultasService
                 return $template_respons->response();
             }
             // melakukan query builder untuk menghapus data fakultas
+            DB::beginTransaction();
+            // dapatkan semua id prodi yang terkait dengan fakultas
+            $prodiIds = DB::table("tb_prodi")->where("fakultas_id", $id)->pluck("id");
+            // hapus data anak dari prodi terkait secara berurutan dari yang terjauh
+            if ($prodiIds->isNotEmpty()) {
+                //hapus data relasi mahasiswa
+                $mahasiswaIds   = DB::table('tb_mahasiswa')->whereIn('prodi_id', $prodiIds)->pluck('id');
+                $mahasiswaNames = DB::table('tb_mahasiswa')->whereIn('prodi_id', $prodiIds)->pluck('nama');
+                if ($mahasiswaIds->isNotEmpty()) {
+                    // penghapusan relasi induk ke dua dari data mahasiswa
+                    $pemilihanMahasiswaIds = DB::table('tb_pemilihan')->whereIn('nama', $mahasiswaNames)->pluck('id');
+                    if ($pemilihanMahasiswaIds->isNotEmpty()) {
+                        // hapus data kalender sistem
+                        $pemilihRuagnanIds = DB::table('tb_pemilihan_ruangan')->whereIn('pemilih_id', $pemilihanMahasiswaIds)->pluck('id');
+                        if ($pemilihRuagnanIds->isNotEmpty()) {
+                            DB::table('tb_kalender_sistem')->whereIn('pemilihan_ruangan_id', $pemilihRuagnanIds)->delete();
+                        }
+                        // hapus data pemilihan ruangan
+                        DB::table('tb_pemilihan_ruangan')->whereIn('pemilih_id', $pemilihanMahasiswaIds)->delete();
+                        // hapus data pemilihan
+                        DB::table('tb_pemilihan')->whereIn('id', $pemilihanMahasiswaIds)->delete();
+                    }
+                    // hapus data mahasiswa
+                    DB::table('tb_mahasiswa')->whereIn('id', $mahasiswaIds)->delete();
+                }
+
+                // hapus data relasi prodi
+                $dosenIds   = DB::table('tb_dosen')->whereIn('prodi_id', $prodiIds)->pluck('id');
+                $dosenNames = DB::table('tb_dosen')->whereIn('prodi_id', $prodiIds)->pluck('nama');
+                if ($dosenIds->isNotEmpty()) {
+                    // penghapusan relasi induk ke dua dari data dosen
+                    $pemilihanDosenIds = DB::table('tb_pemilihan')->whereIn('nama', $dosenNames)->pluck('id');
+                    if ($pemilihanDosenIds->isNotEmpty()) {
+                        // ambil semua id dari pemilihan ruangan
+                        $pemilihRuagnanIds = DB::table('tb_pemilihan_ruangan')->whereIn('pemilih_id', $pemilihanDosenIds)->pluck('id');
+                        if ($pemilihRuagnanIds->isNotEmpty()) {
+                            // hapus data kalender sistem
+                            DB::table('tb_kalender_sistem')->whereIn('pemilihan_ruangan_id', $pemilihRuagnanIds)->delete();
+                        }
+                        // hapus data pemilihan ruangan
+                        DB::table('tb_pemilihan_ruangan')->whereIn('pemilih_id', $pemilihanDosenIds)->delete();
+                        // hapus data pemilihan
+                        DB::table('tb_pemilihan')->whereIn('id', $pemilihanDosenIds)->delete();
+                    }
+                    // hapus data jadwal matakuliah yang berlerasi dengan dosen
+                    DB::table('tb_jadwal_matakuliah')->whereIn('dosen_id', $dosenIds)->delete();
+                    // hapus data dosen
+                    DB::table('tb_dosen')->whereIn('id', $dosenIds)->delete();
+                }
+
+                // happus data relasi matakuliah
+                $matakuliahIds = DB::table('tb_matakuliah')->whereIn('prodi_id', $prodiIds)->pluck('id');
+                if ($matakuliahIds->isNotEmpty()) {
+                    //hapus jadwal matakuliah yang berlerasi dengan matakuliah
+                    $jadwalMatakuliahIds = DB::table('tb_jadwal_matakuliah')->whereIn('matakuliah_id', $matakuliahIds)->pluck('id');
+                    if ($jadwalMatakuliahIds->isNotEmpty()) {
+                        // hapus jadwal kalender sistem
+                        $pemilihanRuanganIds = DB::table('tb_pemilihan_ruangan')->whereIn('jadwal_id', $jadwalMatakuliahIds)->pluck('id');
+                        if ($pemilihanRuanganIds->isNotEmpty()) {
+                            DB::table('tb_kalender_sistem')->whereIn('pemilihan_ruangan_id', $pemilihanRuanganIds)->delete();
+                        }
+                        //hapus data pemilihan ruangan
+                        DB::table('tb_pemilihan_ruangan')->whereIn('jadwal_id', $jadwalMatakuliahIds)->delete();
+                    }
+                    DB::table('tb_jadwal_matakuliah')->whereIn('matakuliah_id', $matakuliahIds)->delete();
+                    // hapus data matakuliah
+                    DB::table('tb_matakuliah')->whereIn('id', $matakuliahIds)->delete();
+                }
+
+                // hapus data relasi tb_ruangan
+                $ruanganIds = DB::table('tb_ruangan')->whereIn('prodi_id', $prodiIds)->pluck('id');
+                if ($ruanganIds->isNotEmpty()) {
+                    // hapus data kalender sistem
+                    $pemilihanRuanganIds = DB::table('tb_pemilihan_ruangan')->whereIn('ruangan_id', $ruanganIds)->pluck('id');
+                    if ($pemilihanRuanganIds->isNotEmpty()) {
+                        DB::table('tb_kalender_sistem')->whereIn('pemilihan_ruangan_id', $pemilihanRuanganIds)->delete();
+                    }
+                    // hapus data pemilihan ruangan
+                    DB::table('tb_pemilihan_ruangan')->whereIn('ruangan_id', $ruanganIds)->delete();
+                    // hapus data ruangan
+                    DB::table('tb_ruangan')->whereIn('id', $ruanganIds)->delete();
+                }
+                // hapus data prodi
+                DB::table('tb_prodi')->whereIn('id', $prodiIds)->delete();
+            }
             DB::table('tb_fakultas')->where('id', $id)->delete();
+            DB::commit();
             // mengembalikan response json berupa pesan fakultas berhasil di hapus
             $data = [
                 'message' => 'Fakultas berhasil dihapus',

@@ -142,13 +142,29 @@ class ruanganService
             // jika id tidak ditemukan maka akan mengembalikan response json dengan pesan error
             $id   = (int) $id;
             $id   = $id > 0 ? $id : 0;
-            $data = DB::table('tb_ruangan')->where('id', $id)->first();
-            if ($data == null) {
+            $data = DB::table('tb_ruangan')->where('id', $id)->exists();
+            if (!$data) {
                 $respons = new Template(false, 'Data Gagal di hapus', 'Data tidak ditemukan');
                 return $respons->response();
             }
             // menghapus data prodi berdasarkan id
-            DB::table('tb_ruangan')->where('id', $id)->delete();
+            DB::beginTransaction();
+            // tahapan menghapus data ruangan
+            // ambil data ruangan berdasarkan id
+            $ruanganIds = DB::table('tb_ruangan')->where('id', $id)->pluck('id');
+            if ($ruanganIds->isNotEmpty()) {
+                // ambil semua id pemilihan ruangan
+                $pemilihanRuanganIds = DB::table('tb_pemilihan_ruangan')->whereIn('ruangan_id', $ruanganIds)->pluck('id');
+                if ($pemilihanRuanganIds->isNotEmpty()) {
+                    // hapus data kalender sistem berdasarkan id dari pemilihan ruangan
+                    DB::table('tb_kalender_sistem')->whereIn('pemilihan_ruangan_id', $pemilihanRuanganIds)->delete();
+                }
+                // hapus data pemilihan ruangan
+                DB::table('tb_pemilihan_ruangan')->whereIn('ruangan_id', $ruanganIds)->delete();
+                // hapus data ruangan
+                DB::table('tb_ruangan')->whereIn('id', $ruanganIds)->delete();
+            }
+            DB::commit();
             // mengembalikan response json
             $respons = new Template(true, 'Data Berhasil di hapus', $data);
             return $respons->response();

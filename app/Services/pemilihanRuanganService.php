@@ -43,6 +43,7 @@ class pemilihanRuanganService
                 ->join("tb_jadwal_matakuliah as tjm", "tpr.jadwal_id", "=", "tjm.id")
                 ->join("tb_pemilihan as tp", "tpr.pemilih_id", "=", "tp.id")
                 ->select($data_list)
+                ->orderBy('pemilihan_ruangan_id', 'desc')
                 ->paginate($paginate);
             // mengembalikan response json
             $response = new Template(true, 'Data Berhasil di ambil', $data_pemilihan_ruangan);
@@ -111,6 +112,8 @@ class pemilihanRuanganService
                 "status_pemilihan"     => "required|boolean",
                 "konfirmasi_kehadiran" => "required|string|in:Hadir,Tidak Hadir,Pending",
             ]);
+            // memanggil data jadwal matakuliah berdasarkan id untuk mengisi data kalender sistem
+            $jadwal_matakuliah = DB::table('tb_jadwal_matakuliah')->where('id', $request->jadwal_id)->first();
             // kondisi validasi
             if ($kondisi) {
                 DB::beginTransaction();
@@ -120,6 +123,18 @@ class pemilihanRuanganService
                     ->update($request->all());
                 // cek apakah data pemilihan ruangan ada atau berhasil di perbarui
                 if ($update_data_pemilihan_ruangan === 0) {
+                    DB::rollBack();
+                    $respons = new Template(false, 'Data Gagal di update', 'Data tidak ditemukan');
+                    return $respons->response();
+                }
+                // update data kalender sistem
+                $update_data_kalender_sistem = DB::table('tb_kalender_sistem')->where('pemilihan_ruangan_id', $id)->update([
+                    "tanggal"       => $request->tanggal_pemilihan,
+                    "waktu_mulai"   => $jadwal_matakuliah->jam_mulai,
+                    "waktu_selesai" => $jadwal_matakuliah->jam_selesai,
+                ]);
+                // cek apakah data kalender sistem ada atau berhasil di perbarui
+                if ($update_data_kalender_sistem === 0) {
                     DB::rollBack();
                     $respons = new Template(false, 'Data Gagal di update', 'Data tidak ditemukan');
                     return $respons->response();
@@ -152,15 +167,29 @@ class pemilihanRuanganService
                 "status_pemilihan"     => "required|boolean",
                 "konfirmasi_kehadiran" => "required|string|in:Hadir,Tidak Hadir,Pending",
             ]);
+            // memanggil data jadwal matakuliah berdasarkan id untuk mengisi data kalender sistem
+            $jadwal_matakuliah = DB::table('tb_jadwal_matakuliah')->where('id', $request->jadwal_id)->first();
             // kondisi validasi
             if ($kondisi) {
                 DB::beginTransaction();
                 // tambah data pemilihan ruangan
                 $id_data_pemilihan_ruangan = DB::table('tb_pemilihan_ruangan')->insertGetId($request->all());
+                // mengisi data kalender sistem
+                $id_data_kalender_sistem = DB::table('tb_kalender_sistem')->insertGetId([
+                    "pemilihan_ruangan_id" => $id_data_pemilihan_ruangan,
+                    "tanggal"              => $request->tanggal_pemilihan,
+                    "waktu_mulai"          => $jadwal_matakuliah->jam_mulai,
+                    "waktu_selesai"        => $jadwal_matakuliah->jam_selesai,
+                ]);
                 DB::commit();
-                // mengembalikan response json data apabila data pemilihan ruangan berhasil di tambahkan
+                // mengembalikan response json data apabila data pemilihan dan kalender ruangan berhasil di tambahkan
                 $data_pemilihan_ruangan = DB::table('tb_pemilihan_ruangan')->where('id', $id_data_pemilihan_ruangan)->first();
-                $respons                = new Template(true, 'Data Berhasil di tambahkan', $data_pemilihan_ruangan);
+                $data_kalender_sistem   = DB::table('tb_kalender_sistem')->where('id', $id_data_kalender_sistem)->first();
+                $data                   = [
+                    "pemilihan_ruangan" => $data_pemilihan_ruangan,
+                    "kalender_sistem"   => $data_kalender_sistem,
+                ];
+                $respons = new Template(true, 'Data Berhasil di tambahkan', $data);
                 return $respons->response();
             } else {
                 // mengembalikan response json data apabila data pemilihan ruangan gagal di tambahkan
@@ -185,7 +214,21 @@ class pemilihanRuanganService
                 return $response->response();
             }
             // melakukan delete data pemilihan ruangan
-            DB::table('tb_pemilihan_ruangan')->where('id', '=', $id)->delete();
+            DB::beginTransaction();
+            // tahapan menghapus data pemilihan ruangan
+            // ambil semua data id pemilihan ruangan
+            $pemilihanRunganIds = DB::table('tb_pemilihan_ruangan')->where('id', $id)->pluck('id');
+            if ($pemilihanRunganIds->isNotEmpty()) {
+                // tahapan menghapus data kalender sistem
+                $kalenderSistemIds = DB::table('tb_kalender_sistem')->whereIn('pemilihan_ruangan_id', $pemilihanRunganIds)->pluck('id');
+                if ($kalenderSistemIds->isNotEmpty()) {
+                    // hapus data kalender sistem
+                    DB::table('tb_kalender_sistem')->whereIn('id', $kalenderSistemIds)->delete();
+                }
+                // hapus data pemilihan ruangan
+                DB::table('tb_pemilihan_ruangan')->whereIn('id', $pemilihanRunganIds)->delete();
+            }
+            DB::commit();
             // mengembalikan response json apabila data pemilihan ruangan berhasil di hapus
             $response = new Template(true, 'Data Berhasil di hapus', $data_pemilihan_ruangan);
             return $response->response();
