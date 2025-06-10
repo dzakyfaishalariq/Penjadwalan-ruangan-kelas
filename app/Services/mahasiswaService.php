@@ -2,9 +2,11 @@
 namespace App\Services;
 
 use App\ApiTemplate\Template;
+use App\Mail\Autentication;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class mahasiswaService
@@ -90,34 +92,87 @@ class mahasiswaService
             ]);
             if ($data_validasi) {
                 DB::beginTransaction();
+                // validasi
                 $id_pemilihan = DB::table('tb_pemilihan')->insertGetId([
                     'nama' => $request->nama,
                     'tipe' => "Mahasiswa",
                 ]);
+                // tambah data atau daftar
                 $id_mahasiswa = DB::table('tb_mahasiswa')->insertGetId([
                     'prodi_id'   => $request->prodi_id,
                     'pemilih_id' => $id_pemilihan,
-                    'nama'       => $request->nama,
-                    'nim'        => $request->nim,
+                    'nama'       => htmlspecialchars($request->nama),
+                    'nim'        => htmlspecialchars($request->nim),
                     'email'      => $request->email,
-                    'username'   => $request->username,
+                    'username'   => htmlspecialchars($request->username),
                     'password'   => Hash::make($request->password),
                     'role'       => $request->role,
                     'api_key'    => Str::random(60),
+                    'created_at' => now(),
+                    'created_up' => now(),
                 ]);
+                // Buat token verifikasi
+                $token = Str::random(60);
+                DB::table('password_reset_tokens')->updateOrInsert(
+                    ['email' => $data_validasi['email']],
+                    [
+                        'token'      => $token,
+                        'created_at' => now(),
+                    ]
+                );
+                // kirim ke email untuk verifikasi
+                Mail::to($data_validasi['email'])->send(new Autentication($token, $data_validasi['email']));
                 DB::commit();
+                // mengambil data mahasiswa dan menampilkannya
                 $data_mahasiswa_by_id = DB::table('tb_mahasiswa')->where('id', $id_mahasiswa)->first();
-                $respons              = new Template(true, 'Data Berhasil di tambahkan', $data_mahasiswa_by_id);
+                unset($data_mahasiswa_by_id->password);
+                $respons = new Template(true, 'Register Berhasil, Silahkan Cek Email anda untuk verifikasi', $data_mahasiswa_by_id);
                 return $respons->response();
             } else {
-                $respons = new Template(false, 'Data Gagal di tambahkan', $data_validasi);
+                $respons = new Template(false, 'Register Gagal', $data_validasi);
                 return $respons->response();
             }
         } catch (Exception $e) {
-            $respons = new Template(false, 'Data Gagal di tambahkan', $e->getMessage());
+            $respons = new Template(false, 'Register Gagal', $e->getMessage());
             return $respons->response();
         }
     }
+
+    public function verifyMahasiswa($request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'email' => 'required|email',
+        ]);
+
+        $tokenData = DB::table('password_reset_tokens')
+            ->where('token', $request->token)
+            ->where('email', $request->email)
+            ->first();
+
+        if (! $tokenData) {
+            return response()->json([
+                'message' => 'Invalid token',
+            ], 422);
+        }
+        DB::beginTransaction();
+        // verifikasi mahasiswa
+        DB::table('tb_mahasiswa')
+            ->where('email', $request->email)
+            ->update([
+                'email_verify_at' => now(),
+            ]);
+        // hapus token yang sudah digunakan
+        DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->delete();
+        DB::commit();
+        return response()->json([
+            'status'  => true,
+            'message' => 'Email verified successfully, Silahkan Login',
+        ]);
+    }
+
     public function updateMahasiswa($request, int $id)
     {
         // memanggil fungsi updateMahasiswa untuk mengupdate data mahasiswa

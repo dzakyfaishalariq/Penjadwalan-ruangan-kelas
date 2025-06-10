@@ -38,6 +38,14 @@ class mahassiwaController extends Controller
         return $respons;
     }
 
+    public function verifyMahasiswa(Request $request)
+    {
+        // memanggil fungsi verifyMahasiswa untuk memverifikasi data mahasiswa pada class mahasiswaService
+        $respons = $this->mahasiswaService->verifyMahasiswa($request);
+
+        return $respons;
+    }
+
     public function updateMahasiswa(Request $request, $id)
     {
         // memanggil fungsi updateMahasiswa untuk mengupdate data mahasiswa pada class mahasiswaService

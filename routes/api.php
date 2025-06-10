@@ -3,6 +3,8 @@
 use App\Http\Controllers\dosenController;
 use App\Http\Controllers\fakultasController;
 use App\Http\Controllers\jadwalMatakuliahController;
+use App\Http\Controllers\kalenderSistemController;
+use App\Http\Controllers\loginController;
 use App\Http\Controllers\mahassiwaController;
 use App\Http\Controllers\matakuliahController;
 use App\Http\Controllers\pemilihanController;
@@ -10,6 +12,35 @@ use App\Http\Controllers\pemilihanRuangaController;
 use App\Http\Controllers\prodiController;
 use App\Http\Controllers\ruaganController;
 use Illuminate\Support\Facades\Route;
+
+// Router LOGIN
+Route::middleware('api')->post('/mahasiswa_login', [loginController::class, 'loginMahasiswa']);
+
+// hak akses mahasiswa
+Route::middleware('authMahasiswa.api')->group(function () {
+    // akses mahasiswa
+    Route::middleware('api')->get('/mahasiswa_akses_by_id/{id}', [mahassiwaController::class, 'getMahasiswaById']);
+    // rute untuk melakukan update data mahasiswa berdasarkan ID bertujuan untuk pembaruan data mahasiswa oleh siswa sendiri
+    Route::middleware('api')->put('/mahasiswa_akses/update/{id}', [mahassiwaController::class, 'updateMahasiswa']);
+    // akses ruangan
+    Route::middleware('api')->get('/mahasiswa_akses_ruangan/{paginate}', [ruaganController::class, 'getRuangan']);
+    // akses total ruangan
+    Route::middleware('api')->get('/mahasiswa_akses_total/ruangan', [ruaganController::class, 'totalRuangan']);
+    // akses pemilihan ruangan
+    // memboking ruangan
+    Route::middleware('api')->post('/pemilihan_ruangan_mahasiswa_akses/booking', [pemilihanRuangaController::class, 'addPemilihanRungan']);
+    // menampilkan semua history pemilihan ruangan
+    Route::middleware('api')->get('/pemilihan_ruangan_mahasiswa_akses/{paginate}', [pemilihanRuangaController::class, 'getPemilihanRuangan']);
+    // akses jadwal matakuliah
+    Route::middleware('api')->get('/mahasiswa_akses_jadwal/{paginate}', [jadwalMatakuliahController::class, 'getJadwalMatakuliah']);
+    // akses kalender sistem
+    Route::middleware('api')->get('/mahasiswa_akses_kalender{paginate}', [kalenderSistemController::class, 'getKalenderSistem']);
+    // akses kalender berdasarkan id
+    Route::middleware('api')->get('/mahasiswa_akses_kalender/{id}', [kalenderSistemController::class, 'getKalenderSistemById']);
+    // akses matakuliah
+    Route::middleware('api')->get('/mahasiswa_akses_matkul/{paginate}', [matakuliahController::class, 'getMatkul']);
+
+});
 
 // ROUTER FAKULTAS
 // rute untuk memanggil semua data fakultas
@@ -80,8 +111,10 @@ Route::middleware('api')->get('/mahasiswa/{paginate}', [mahassiwaController::cla
 Route::middleware('api')->get('/mahasiswaById/{id}', [mahassiwaController::class, 'getMahasiswaById']);
 // rute untuk menambahkan data mahasiswa dengan validasi dan paramter inputan POST
 Route::middleware('api')->post('/mahasiswa/add', [mahassiwaController::class, 'createMahasiswa']);
+// verifikasi email mahasiswa
+Route::middleware('api')->get('/verify-email', [mahassiwaController::class, 'verifyMahasiswa']);
 // rute untuk memperbarui data mahasiswa berdasarkan ID
-Route::middleware('api')->put('/mahasiswa/update/{id}', [mahassiwaController::class, 'updateMahasiswa']);
+Route::middleware('api')->put('/mahasiswaAdmin/update/{id}', [mahassiwaController::class, 'updateMahasiswa']);
 // rute untuk menghapus data mahasiswa berdasarkan ID
 Route::middleware('api')->delete('/mahasiswa/delete/{id}', [mahassiwaController::class, 'deleteMahasiswa']);
 // rute untuk melihat total mahasiswa
