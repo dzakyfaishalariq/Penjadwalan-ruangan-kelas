@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // mildeware untuk akses mahasiswa
         $middleware->alias([
             'authMahasiswa.api' => \App\Http\Middleware\AuthenticateMahasiswaAPI::class,
+            'authDosen.api' => \App\Http\Middleware\AuthenticateDosenAPI::class,
+            'authAdmin.api' => \App\Http\Middleware\AuthenticateAdminAPI::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

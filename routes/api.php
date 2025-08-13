@@ -39,7 +39,15 @@ Route::middleware('authMahasiswa.api')->group(function () {
     Route::middleware('api')->get('/mahasiswa_akses_kalender/{id}', [kalenderSistemController::class, 'getKalenderSistemById']);
     // akses matakuliah
     Route::middleware('api')->get('/mahasiswa_akses_matkul/{paginate}', [matakuliahController::class, 'getMatkul']);
+});
 
+// hak akses dosen
+Route::middleware('authDosen.api')->group(function () {
+    // akses dosen
+    Route::middleware('api')->get('/dosen_akses_by_id/{id}', [dosenController::class, 'getDosenById']);
+    // rute untuk melakukan update data dosen berdasarkan ID bertujuan untuk pembaruan data dosen oleh dosen sendiri
+    Route::middleware('api')->post('/dosen_akses/add', [dosenController::class, 'createDosen']);
+    
 });
 
 // ROUTER FAKULTAS

@@ -92,7 +92,7 @@ class mahasiswaService
             ]);
             if ($data_validasi) {
                 DB::beginTransaction();
-                // validasi
+                // insert data pemilihan
                 $id_pemilihan = DB::table('tb_pemilihan')->insertGetId([
                     'nama' => $request->nama,
                     'tipe' => "Mahasiswa",

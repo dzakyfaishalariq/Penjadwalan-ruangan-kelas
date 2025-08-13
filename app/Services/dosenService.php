@@ -2,9 +2,11 @@
 namespace App\Services;
 
 use App\ApiTemplate\Template;
+use App\Mail\Autentication;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class dosenService
@@ -99,11 +101,13 @@ class dosenService
             // cek kondisi apabila memenuhi data dosen akan di tambahkan kedalam table dosen jika gagal akan mengembalikan response json dengan pesan error
             if ($kondisi) {
                 DB::beginTransaction();
+                // menambahkan data pemilihan
                 $tambah_data_pemilih = DB::table('tb_pemilihan')
                     ->insertGetId([
                         'nama' => $request->nama,
                         'tipe' => "Dosen",
                     ]);
+                // menambahkan data dosen
                 $tambah_data_dosen = DB::table('tb_dosen')->insertGetId([
                     'prodi_id'   => $request->prodi_id,
                     'pemilih_id' => $tambah_data_pemilih,
@@ -113,7 +117,20 @@ class dosenService
                     'username'   => $request->username,
                     'password'   => Hash::make($request->password),
                     'api_key'    => Str::random(60),
+                    'created_at' => now(),
+                    'created_up' => now(),
                 ]);
+                // buat token verifikasi
+                $token = Str::random(60);
+                DB::table('password_reset_tokens')->updateOrInsert(
+                    ['email' => $kondisi['email']],
+                    [
+                        'token'      => $token,
+                        'created_at' => now(),
+                    ]
+                );
+                // kirim ke email untuk verifikasi
+                Mail::to($kondisi['email'])->send(new Autentication($token, $kondisi['email']));
                 DB::commit();
                 $data_pemilih_hasil_tambahan = DB::table('tb_pemilihan')->where('id', $tambah_data_pemilih)->first();
                 $data_dosen_hasil_tambahan   = DB::table('tb_dosen')->where('id', $tambah_data_dosen)->first();
@@ -121,7 +138,7 @@ class dosenService
                     'pemilihan'  => $data_pemilih_hasil_tambahan,
                     'data_dosen' => $data_dosen_hasil_tambahan,
                 ];
-                $respons = new Template(true, 'Data Berhasil di tambahkan', $data);
+                $respons = new Template(true, 'Data Berhasil di tambahkan silahkan cek email anda untuk verifikasi', $data);
                 return $respons->response();
             } else {
                 $respons = new Template(false, 'Data Gagal di tambahkan', $kondisi);

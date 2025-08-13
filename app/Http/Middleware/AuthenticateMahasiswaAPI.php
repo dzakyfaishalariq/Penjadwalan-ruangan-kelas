@@ -21,7 +21,7 @@ class AuthenticateMahasiswaAPI
         if (! $token) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token Tidak Tersedia',
+                'message' => 'Token Mahasiswa Tidak Tersedia',
             ], 401);
         }
 
@@ -31,7 +31,7 @@ class AuthenticateMahasiswaAPI
         if (! $userMahasiswa) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token Tidak Valid',
+                'message' => 'Token Mahasiswa Tidak Valid',
             ]);
         }
         // tambahkan data user ke request
