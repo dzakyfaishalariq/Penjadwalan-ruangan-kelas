@@ -97,6 +97,8 @@ class mahasiswaService
                     'nama' => $request->nama,
                     'tipe' => "Mahasiswa",
                 ]);
+                // create api key dengan waktu selama satu jam
+                $api_key = Str::random(60);
                 // tambah data atau daftar
                 $id_mahasiswa = DB::table('tb_mahasiswa')->insertGetId([
                     'prodi_id'   => $request->prodi_id,

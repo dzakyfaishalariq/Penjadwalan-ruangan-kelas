@@ -41,10 +41,10 @@ class loginService
             if (! $user || ! Hash::check($credentials['password'], $user->password_mahasiswa)) {
                 return response()->json([
                     'success' => false,
-                    'user' => $user,
-                    'cek' => Hash::check($credentials['password'], $user->password_mahasiswa),
-                    'password' => $credentials['password'],
-                    'hash' => $user->password_mahasiswa,
+                    // 'user' => $user,
+                    // 'cek' => Hash::check($credentials['password'], $user->password_mahasiswa),
+                    // 'password' => $credentials['password'],
+                    // 'hash' => $user->password_mahasiswa,
                     'message' => 'Email atau password salah',
                 ], 401);
             }

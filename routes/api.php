@@ -18,7 +18,7 @@ Route::middleware('api')->post('/mahasiswa_login', [loginController::class, 'log
 
 // hak akses mahasiswa
 Route::middleware('authMahasiswa.api')->group(function () {
-    // akses mahasiswa
+    // akses mahasiswa sesuai id yang login
     Route::middleware('api')->get('/mahasiswa_akses_by_id/{id}', [mahassiwaController::class, 'getMahasiswaById']);
     // rute untuk melakukan update data mahasiswa berdasarkan ID bertujuan untuk pembaruan data mahasiswa oleh siswa sendiri
     Route::middleware('api')->put('/mahasiswa_akses/update/{id}', [mahassiwaController::class, 'updateMahasiswa']);
@@ -43,11 +43,12 @@ Route::middleware('authMahasiswa.api')->group(function () {
 
 // hak akses dosen
 Route::middleware('authDosen.api')->group(function () {
-    // akses dosen
+    // akses dosen sesuai id yang login
     Route::middleware('api')->get('/dosen_akses_by_id/{id}', [dosenController::class, 'getDosenById']);
     // rute untuk melakukan update data dosen berdasarkan ID bertujuan untuk pembaruan data dosen oleh dosen sendiri
     Route::middleware('api')->post('/dosen_akses/add', [dosenController::class, 'createDosen']);
-    
+    // akses ruangan
+    Route::middleware('api')->get('/dosen_akses_ruangan/{paginate}', [ruaganController::class, 'getRuangan']);
 });
 
 // ROUTER FAKULTAS
