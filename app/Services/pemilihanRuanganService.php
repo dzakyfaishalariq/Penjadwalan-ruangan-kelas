@@ -54,6 +54,97 @@ class pemilihanRuanganService
             return $response->response();
         }
     }
+    public function getPemilihanRuanganSemua()
+    {
+        try {
+            // inisialisasi select data
+            $data_list = [
+                "tpr.id as pemilihan_ruangan_id",
+                "tpr.ruangan_id",
+                "tr.prodi_id",
+                "tr.nama_ruangan",
+                "tr.kapasitas",
+                "tr.status as status_ruangan",
+                "tpr.jadwal_id",
+                "tjm.matakuliah_id",
+                "tjm.dosen_id",
+                "tjm.hari",
+                "tjm.jam_mulai",
+                "tjm.jam_selesai",
+                "tpr.pemilih_id",
+                "tp.nama as nama_pemilihan",
+                "tp.tipe as tipe_pemilihan",
+                "tpr.tanggal_pemilihan",
+                "tpr.status_pemilihan",
+                "tpr.konfirmasi_kehadiran",
+            ];
+            $data_pemilihan_ruangan = DB::table('tb_pemilihan_ruangan as tpr')
+                ->join("tb_ruangan as tr", "tpr.ruangan_id", "=", "tr.id")
+                ->join("tb_jadwal_matakuliah as tjm", "tpr.jadwal_id", "=", "tjm.id")
+                ->join("tb_pemilihan as tp", "tpr.pemilih_id", "=", "tp.id")
+                ->select($data_list)
+                ->orderBy('pemilihan_ruangan_id', 'desc')
+                ->get();
+            // mengembalikan response json
+            $response = new Template(true, 'Data Berhasil di ambil', $data_pemilihan_ruangan);
+            return $response->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $response = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $response->response();
+        }
+    }
+    public function getPemilihanRuanganByPemilih(int $pemilih_id, int $paginate = 3)
+    {
+        try {
+            // validasi id tidak boleh kurang dari 0
+            $pemilih_id = $pemilih_id > 0 ? $pemilih_id : 0;
+            // batasi paginate di range 100
+            $paginate = max(1, (min($paginate, 100)));
+            // inisialisasi select data
+            $data_list = [
+                "tpr.id as pemilihan_ruangan_id",
+                "tpr.ruangan_id",
+                "tr.prodi_id",
+                "tr.nama_ruangan",
+                "tr.kapasitas",
+                "tr.status as status_ruangan",
+                "tpr.jadwal_id",
+                "tjm.matakuliah_id",
+                "tjm.dosen_id",
+                "tjm.hari",
+                "tjm.jam_mulai",
+                "tjm.jam_selesai",
+                "tpr.pemilih_id",
+                "tp.nama as nama_pemilihan",
+                "tp.tipe as tipe_pemilihan",
+                "tpr.tanggal_pemilihan",
+                "tpr.status_pemilihan",
+                "tpr.konfirmasi_kehadiran",
+            ];
+            // memanggil semua data pemilihan ruangan
+            $data_pemilihan_ruangan = DB::table('tb_pemilihan_ruangan as tpr')
+                ->join("tb_ruangan as tr", "tpr.ruangan_id", "=", "tr.id")
+                ->join("tb_jadwal_matakuliah as tjm", "tpr.jadwal_id", "=", "tjm.id")
+                ->join("tb_pemilihan as tp", "tpr.pemilih_id", "=", "tp.id")
+                ->where('tpr.pemilih_id', $pemilih_id)
+                ->select($data_list)
+                ->orderBy('pemilihan_ruangan_id', 'desc')
+                ->paginate($paginate);
+            // mengembalikan response json
+            $response = new Template(true, 'Data Berhasil di ambil', $data_pemilihan_ruangan);
+            return $response->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $response = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $response->response();
+        }
+    }
+
+    public function konfirmasiKehadiran(int $id)
+    {
+
+    }
     public function getPemilihanRuanganById(int $id)
     {
         try {
@@ -180,6 +271,10 @@ class pemilihanRuanganService
                     "tanggal"              => $request->tanggal_pemilihan,
                     "waktu_mulai"          => $jadwal_matakuliah->jam_mulai,
                     "waktu_selesai"        => $jadwal_matakuliah->jam_selesai,
+                ]);
+                // ubah status ruangan jika sudah ada pemilihan
+                DB::table('tb_ruangan')->where('id', $request->ruangan_id)->update([
+                    "status" => 0,
                 ]);
                 DB::commit();
                 // mengembalikan response json data apabila data pemilihan dan kalender ruangan berhasil di tambahkan

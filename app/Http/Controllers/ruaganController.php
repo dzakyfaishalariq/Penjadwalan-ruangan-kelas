@@ -11,9 +11,9 @@ class ruaganController extends Controller
     {
         $this->ruanganService = $ruanganService;
     }
-    public function getRuangan($paginate)
+    public function getRuangan($paginate, Request $request)
     {
-        $ruangan = $this->ruanganService->getRuangan($paginate);
+        $ruangan = $this->ruanganService->getRuangan($paginate, $request);
         return $ruangan;
     }
     public function getRuanganById($id)
@@ -40,6 +40,18 @@ class ruaganController extends Controller
     public function totalRuangan()
     {
         $ruangan = $this->ruanganService->totalRuangan();
+        return $ruangan;
+    }
+
+    public function totalRuanganTerpakai()
+    {
+        $ruangan = $this->ruanganService->totalRuanganTerpakai();
+        return $ruangan;
+    }
+
+    public function getNamaRuangan()
+    {
+        $ruangan = $this->ruanganService->getNamaRuangan();
         return $ruangan;
     }
 }

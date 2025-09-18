@@ -176,7 +176,7 @@ class dosenService
                 //update data pemilihan
                 $data_pemilihan = DB::table('tb_pemilihan')->where('id', $data_dosen->pemilih_id)->update([
                     'nama' => $request->nama,
-                    'tipe' => $request->tipe,
+                    'tipe' => "Dosen",
                 ]);
                 if ($data_pemilihan === 0) {
                     DB::rollBack();
@@ -191,7 +191,7 @@ class dosenService
                     'email'      => $request->email,
                     'username'   => $request->username,
                     'password'   => Hash::make($request->password),
-                    'api_key'    => Str::random(60),
+                    // 'api_key'    => Str::random(60),
                 ]);
                 if ($data_dosen_update === 0) {
                     DB::rollBack();

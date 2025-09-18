@@ -28,6 +28,20 @@ class prodiService
             return $respons->response();
         }
     }
+    public function getProdiAll()
+    {
+        try {
+            // fungsi memanggil semua data prodi
+            $data = DB::table('tb_prodi')->get();
+            // mengembalikan response json
+            $respons = new Template(true, 'Data Berhasil di ambil', $data);
+            return $respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
     public function getProdiToFakultas(int $paginate = 10)
     {
         // lakukan pengecekan apakah nilai pagination negatif atau tidak

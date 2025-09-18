@@ -32,7 +32,7 @@ class AuthenticateMahasiswaAPI
             return response()->json([
                 'success' => false,
                 'message' => 'Token Mahasiswa Tidak Valid',
-            ]);
+            ], 401);
         }
         // tambahkan data user ke request
         $request->attributes->add([

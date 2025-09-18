@@ -199,9 +199,10 @@ class mahasiswaService
                     'nama' => $request->nama,
                     'tipe' => "Mahasiswa",
                 ]);
+                $data_tes = DB::table('tb_pemilihan')->where('id', $data_mahasiswa->pemilih_id)->first();
                 if ($data_pemilihan === 0) {
                     DB::rollBack();
-                    $respons = new Template(false, 'Data Gagal di update', 'Data pemilihan tidak ditemukan');
+                    $respons = new Template(false, 'Data Gagal di update', $data_tes);
                     return $respons->response();
                 }
                 $data_mahasiswa_update = DB::table('tb_mahasiswa')->where('id', $id)->update([
@@ -213,7 +214,7 @@ class mahasiswaService
                     'username'   => $request->username,
                     'password'   => Hash::make($request->password),
                     'role'       => $request->role,
-                    'api_key'    => Str::random(60),
+                    // 'api_key'    => Str::random(60),
                 ]);
                 if ($data_mahasiswa_update === 0) {
                     DB::rollBack();

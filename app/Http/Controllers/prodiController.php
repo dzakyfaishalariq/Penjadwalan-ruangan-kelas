@@ -22,6 +22,13 @@ class prodiController extends Controller
 
         return $prodi;
     }
+    public function getProdiAll()
+    {
+        // memanggil semua data prodi
+        $prodi = $this->prodiService->getProdiAll();
+
+        return $prodi;
+    }
     public function getProdiToFakultas($paginate)
     {
         // memanggil data prodi dengan relasi pada table fakultas

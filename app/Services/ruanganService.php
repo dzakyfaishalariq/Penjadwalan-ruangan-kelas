@@ -8,12 +8,14 @@ use Illuminate\Support\Facades\DB;
 class ruanganService
 {
 
-    public function getRuangan(int $paginate)
+    public function getRuangan(int $paginate, $request)
     {
         // batasi jika nilai paginate kurang dari 0
         $paginate = $paginate > 0 ? $paginate : 10;
         // validasi paginate
         $paginate = max(1, (min($paginate, 100)));
+        // ambil parameter pencarian dari request
+        $search = $request->input('search', '');
         try {
             // buat array select data
             $select_data = [
@@ -23,12 +25,50 @@ class ruanganService
                 'tr.nama_ruangan',
                 'tr.kapasitas',
                 'tr.status',
+                'tr.lantai',
             ];
             // memanggil semua data ruangan
+            // $data_ruangan = DB::table('tb_ruangan as tr')
+            //     ->join('tb_prodi as tp', 'tr.prodi_id', '=', 'tp.id')
+            //     ->select($select_data)
+            //     ->orderBy('ruangan_id', 'desc')
+            //     ->paginate($paginate);
             $data_ruangan = DB::table('tb_ruangan as tr')
                 ->join('tb_prodi as tp', 'tr.prodi_id', '=', 'tp.id')
-                ->select($select_data)
-                ->orderBy('ruangan_id', 'desc')
+                ->select($select_data);
+
+            // Kondisi pencarian jika ada
+            if (! empty($search)) {
+                $data_ruangan->where(function ($q) use ($search) {
+                    // Pencarian berdasarkan nama ruangan (case-insensitive)
+                    $q->where('tr.nama_ruangan', 'LIKE', '%' . $search . '%');
+
+                    // Pencarian berdasarkan lantai (jika search adalah angka)
+                    if (is_numeric($search)) {
+                        $q->orWhere('tr.lantai', '=', (int) $search);
+                    }
+
+                    // Pencarian singkatan (huruf pertama setiap kata)
+                    $words = array_filter(explode(' ', $search));
+                    if (count($words) > 0) {
+                        $pattern = '';
+                        foreach ($words as $word) {
+                            if (! empty(trim($word))) {
+                                $pattern .= substr(trim($word), 0, 1) . '%';
+                            }
+                        }
+                        $q->orWhere('tr.nama_ruangan', 'LIKE', $pattern);
+                    }
+
+                    // Pencarian kombinasi: "lantai 1" atau "ruang 2"
+                    if (preg_match('/(lantai|ruang|lt|floor|l)\s*(\d+)/i', $search, $matches)) {
+                        $q->orWhere('tr.lantai', '=', (int) $matches[2]);
+                    }
+
+                });
+            }
+
+            $data_ruangan = $data_ruangan->orderBy('ruangan_id', 'desc')
                 ->paginate($paginate);
             // mengembalikan response json
             $respons = new Template(true, 'Data Berhasil di ambil', $data_ruangan);
@@ -40,6 +80,26 @@ class ruanganService
             return $respons->response();
         }
     }
+
+    public function getNamaRuangan()
+    {
+        // ambil id dan nama ruangan
+        try {
+            $data = DB::table('tb_ruangan')->select([
+                'id',
+                'nama_ruangan',
+                'status',
+            ])->get();
+            $respons = new Template(true, 'Data Berhasil di ambil', $data);
+            return $respons->response();
+        } catch (Exception $e) {
+            //throw $e;
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
+
     public function getRuanganById(int $id)
     {
         // validasi id tidak boleh kurang dari 0
@@ -143,7 +203,7 @@ class ruanganService
             $id   = (int) $id;
             $id   = $id > 0 ? $id : 0;
             $data = DB::table('tb_ruangan')->where('id', $id)->exists();
-            if (!$data) {
+            if (! $data) {
                 $respons = new Template(false, 'Data Gagal di hapus', 'Data tidak ditemukan');
                 return $respons->response();
             }
@@ -181,6 +241,20 @@ class ruanganService
             // menghitung total prodi
             $data = DB::table('tb_ruangan')->count();
             // mengembalikan response json apabila berhasil menampilkan jumlah data prodi
+            $respons = new Template(true, 'Total Berhasil di ambil', $data);
+            return $respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
+
+    public function totalRuanganTerpakai()
+    {
+        try {
+            $data = DB::table('tb_ruangan')
+                ->where('status', 0)->count();
             $respons = new Template(true, 'Total Berhasil di ambil', $data);
             return $respons->response();
         } catch (Exception $e) {
