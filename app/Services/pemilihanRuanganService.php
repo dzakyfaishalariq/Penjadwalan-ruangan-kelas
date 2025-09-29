@@ -131,8 +131,42 @@ class pemilihanRuanganService
                 ->select($data_list)
                 ->orderBy('pemilihan_ruangan_id', 'desc')
                 ->paginate($paginate);
+            // jika data kosong maka mengembalikan response json
+            if ($data_pemilihan_ruangan->isEmpty()) {
+                $response = new Template(false, 'Data Gagal di ambil', 'Data pemilihan ruangan tidak ditemukan anda belum memesan ruangan.');
+                return $response->response();
+            } else {
+                // mengembalikan response json
+                $response = new Template(true, 'Data Berhasil di ambil', $data_pemilihan_ruangan);
+                return $response->response();
+            }
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $response = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $response->response();
+        }
+    }
+
+    public function konfirmasiKehadiranRuangan(int $id)
+    {
+        try {
+            DB::beginTransaction();
+            // ambil data ruangan pilihan
+            $data_ruangan_pilihan = DB::table('tb_pemilihan_ruangan')
+                ->where('id', $id)
+                ->select('ruangan_id')
+                ->first();
+            // update data pemilihan ruangan bagian konfirmasi kehadiran dan status pemilihan
+            DB::table('tb_pemilihan_ruangan')
+                ->where('id', $id)
+                ->update(['konfirmasi_kehadiran' => "Hadir", 'status_pemilihan' => 1]);
+            // update data ruangan bagian status
+            DB::table('tb_ruangan')
+                ->where('id', $data_ruangan_pilihan->ruangan_id)
+                ->update(['status' => 0]);
+            DB::commit();
             // mengembalikan response json
-            $response = new Template(true, 'Data Berhasil di ambil', $data_pemilihan_ruangan);
+            $response = new Template(true, "data berhasil di ubah", null);
             return $response->response();
         } catch (Exception $e) {
             // mengembalikan response json apabila terjadi error
@@ -141,10 +175,34 @@ class pemilihanRuanganService
         }
     }
 
-    public function konfirmasiKehadiran(int $id)
+    public function batalkanPemilihanRuangan(int $id)
     {
-
+        try {
+            DB::beginTransaction();
+            // ambil data ruangan pilihan
+            $data_ruangan_pilihan = DB::table('tb_pemilihan_ruangan')
+                ->where('id', $id)
+                ->select('ruangan_id')
+                ->first();
+            // update data pemilihan ruangan bagian konfirmasi kehadiran dan status pemilihan
+            DB::table('tb_pemilihan_ruangan')
+                ->where('id', $id)
+                ->update(['konfirmasi_kehadiran' => "Tidak Hadir", 'status_pemilihan' => 0]);
+            // update data ruangan bagian status
+            DB::table('tb_ruangan')
+                ->where('id', $data_ruangan_pilihan->ruangan_id)
+                ->update(['status' => 1]);
+            DB::commit();
+            // mengembalikan response json
+            $response = new Template(true, "data berhasil di ubah", null);
+            return $response->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $response = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $response->response();
+        }
     }
+
     public function getPemilihanRuanganById(int $id)
     {
         try {

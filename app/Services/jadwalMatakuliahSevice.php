@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class jadwalMatakuliahSevice
 {
-    public function getJadwalMatakuliah(int $paginate = 10)
+    public function getJadwalMatakuliah(int $paginate)
     {
         try {
             // validasi paginate apabila kurang dari 0
@@ -20,6 +20,7 @@ class jadwalMatakuliahSevice
                 'tm.id as matakuliah_id',
                 'tm.nama_matakuliah',
                 'tm.sks',
+                'tm.kodemk',
                 'td.nama as nama_dosen',
                 'td.nip as nip_dosen',
                 'td.email as email_dosen',
@@ -32,6 +33,7 @@ class jadwalMatakuliahSevice
                 ->join('tb_matakuliah as tm', 'tjm.matakuliah_id', '=', 'tm.id')
                 ->join('tb_dosen as td', 'tjm.dosen_id', '=', 'td.id')
                 ->select($select_data)
+                ->orderBy('jadwal_matakuliah_id', 'desc')
                 ->paginate($paginate);
             // mengembalikan response json apabila data sudah siap ditampilkan
             $response = new Template(true, 'Data Berhasil di ambil', $data_jadwal_matakuliah);
@@ -49,6 +51,7 @@ class jadwalMatakuliahSevice
                 'tjm.id',
                 'tm.nama_matakuliah',
                 'tm.sks',
+                'tm.kodemk',
                 'td.nama as nama_dosen',
                 'tjm.hari',
                 'tjm.jam_mulai',

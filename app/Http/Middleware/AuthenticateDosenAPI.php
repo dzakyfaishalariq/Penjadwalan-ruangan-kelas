@@ -33,7 +33,7 @@ class AuthenticateDosenAPI
             return response()->json([
                 'success' => false,
                 'message' => 'Token Dosen Tidak Valid',
-            ]);
+            ], 401);
         }
         // tambahkan data user ke request
         $request->attributes->add([

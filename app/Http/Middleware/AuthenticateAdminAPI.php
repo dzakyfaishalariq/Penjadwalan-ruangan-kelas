@@ -32,7 +32,7 @@ class AuthenticateAdminAPI
             return response()->json([
                 'success' => false,
                 'message' => 'Token Admin Tidak Valid',
-            ]);
+            ], 401);
         }
         // tambahkan data user ke request
         $request->attributes->add([

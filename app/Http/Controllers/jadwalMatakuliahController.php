@@ -12,9 +12,9 @@ class jadwalMatakuliahController extends Controller
         $this->jadwalMatakuliahService = $jadwalMatakuliahService;
     }
 
-    public function getJadwalMatakuliah()
+    public function getJadwalMatakuliah($paginate = 10)
     {
-        $jadwalMatakuliah = $this->jadwalMatakuliahService->getJadwalMatakuliah();
+        $jadwalMatakuliah = $this->jadwalMatakuliahService->getJadwalMatakuliah($paginate);
         return $jadwalMatakuliah;
     }
     public function getJadwalMatakuliahById($id)

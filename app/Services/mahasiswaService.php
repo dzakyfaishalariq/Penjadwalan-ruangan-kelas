@@ -172,7 +172,7 @@ class mahasiswaService
         return response()->json([
             'status'  => true,
             'message' => 'Email verified successfully, Silahkan Login',
-        ]);
+        ], 200);
     }
 
     public function updateMahasiswa($request, int $id)

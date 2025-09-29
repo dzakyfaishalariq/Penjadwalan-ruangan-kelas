@@ -2,7 +2,7 @@
 namespace App\Services;
 
 use App\ApiTemplate\Template;
-use App\Mail\Autentication;
+use App\Mail\AutenticationDosen;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -49,6 +49,25 @@ class dosenService
             return $respons->response();
         }
     }
+    public function getDosenAll()
+    {
+        try {
+            // mengambil semua data dosen
+            $data_dosen = DB::table('tb_dosen')->get();
+            // chek apakah data dosen tidak ditemukan
+            if ($data_dosen == null) {
+                $respons = new Template(false, 'Data Gagal di ambil', 'Data dosen tidak ditemukan');
+                return $respons->response();
+            } else {
+                $respons = new Template(true, 'Data Berhasil di ambil', $data_dosen);
+                return $respons->response();
+            }
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
     public function getDosenById(int $id)
     {
         try {
@@ -68,8 +87,10 @@ class dosenService
                     'tb_dosen.nama as dosen',
                     'tb_dosen.nip as nip',
                     'tb_dosen.email as email',
+                    'tb_dosen.username as username',
                     'tb_dosen.password as password',
                     'tb_dosen.api_key as api_key',
+                    'tb_dosen.role as role',
                 )->first();
             // chek apakah data dosen tidak ditemukan
             if ($data_dosen_by_id == null) {
@@ -97,6 +118,7 @@ class dosenService
                 'email'    => 'required|string|max:255',
                 'username' => 'required|string|max:255',
                 'password' => 'required|string|min:8|max:255',
+                'role'     => 'required|string|max:255',
             ]);
             // cek kondisi apabila memenuhi data dosen akan di tambahkan kedalam table dosen jika gagal akan mengembalikan response json dengan pesan error
             if ($kondisi) {
@@ -117,6 +139,7 @@ class dosenService
                     'username'   => $request->username,
                     'password'   => Hash::make($request->password),
                     'api_key'    => Str::random(60),
+                    'role'       => $request->role,
                     'created_at' => now(),
                     'created_up' => now(),
                 ]);
@@ -130,7 +153,7 @@ class dosenService
                     ]
                 );
                 // kirim ke email untuk verifikasi
-                Mail::to($kondisi['email'])->send(new Autentication($token, $kondisi['email']));
+                Mail::to($kondisi['email'])->send(new AutenticationDosen($token, $kondisi['email']));
                 DB::commit();
                 $data_pemilih_hasil_tambahan = DB::table('tb_pemilihan')->where('id', $tambah_data_pemilih)->first();
                 $data_dosen_hasil_tambahan   = DB::table('tb_dosen')->where('id', $tambah_data_dosen)->first();
@@ -150,6 +173,40 @@ class dosenService
             return $respons->response();
         }
     }
+
+    public function verifyDosen($request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'email' => 'required|email',
+        ]);
+
+        $tokenData = DB::table('password_reset_tokens')
+            ->where('token', $request->token)
+            ->where('email', $request->email)
+            ->first();
+        if (! $tokenData) {
+            return response()->json([
+                'message' => 'Invalid token',
+            ], 422);
+        }
+        DB::beginTransaction();
+        // verifikasi dosen
+        DB::table('tb_dosen')
+            ->where('email', $request->email)
+            ->update([
+                'email_verify_at' => now(),
+            ]);
+        // hapus token yang sudah digunakan
+        DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->delete();
+        DB::commit();
+        return response()->json([
+            'status'  => true,
+            'message' => 'Data Berhasil di verifikasi',
+        ], 200);
+    }
     public function updateDosen($request, int $id)
     {
         // fungsi untuk mengupdate data dosen
@@ -163,12 +220,13 @@ class dosenService
             // melakukan validasi data yang akan di inputkan
             $kondisi = $request->validate([
                 'prodi_id' => 'required|integer',
-                'tipe'     => 'required|string|max:255',
+                // 'tipe'     => 'required|string|max:255',
                 'nama'     => 'required|string|max:255',
                 'nip'      => 'required|string|max:255|regex:/^[A-Za-z0-9]+$/',
                 'email'    => 'required|string|max:255',
                 'username' => 'required|string|max:255',
                 'password' => 'required|string|min:8|max:255',
+                'role'     => 'required|string|max:255',
             ]);
             // cek kondisi apabila memenuhi data dosen akan di tambahkan kedalam table dosen jika gagal akan mengembalikan response json dengan pesan error
             if ($kondisi) {
@@ -191,6 +249,8 @@ class dosenService
                     'email'      => $request->email,
                     'username'   => $request->username,
                     'password'   => Hash::make($request->password),
+                    'role'       => $request->role,
+                    'created_up' => now(),
                     // 'api_key'    => Str::random(60),
                 ]);
                 if ($data_dosen_update === 0) {

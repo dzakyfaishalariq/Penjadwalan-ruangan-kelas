@@ -20,6 +20,13 @@ class dosenController extends Controller
 
         return $respons;
     }
+    public function getDosenAll()
+    {
+        // memanggil fungsi getDosenAll untuk menampilkan semua data dosen pada class dosenService
+        $respons = $this->dosenService->getDosenAll();
+
+        return $respons;
+    }
     public function getDosenById($id)
     {
         // memanggil fungsi getDosenById untuk menampilkan data dosen berdasarkan id pada class dosenService
@@ -31,6 +38,13 @@ class dosenController extends Controller
     {
         // memanggil fungsi createDosen untuk menambahkan data dosen pada class dosenService
         $respons = $this->dosenService->createDosen($request);
+
+        return $respons;
+    }
+
+    public function verifyDosen(Request $request)
+    {
+        $respons = $this->dosenService->verifyDosen($request);
 
         return $respons;
     }

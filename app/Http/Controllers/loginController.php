@@ -20,4 +20,11 @@ class loginController extends Controller
 
         return $response;
     }
+    public function loginDosen(Request $request)
+    {
+        // memanggil fungsi login_dosen pada class loginService
+        $response = $this->loginService->login_dosen($request);
+
+        return $response;
+    }
 }

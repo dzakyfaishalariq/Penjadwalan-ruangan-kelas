@@ -37,6 +37,16 @@ class pemilihanRuangaController extends Controller
         return $this->pemilihanRuanganService->updatePemilihanRungan($request, $id);
     }
 
+    public function konfirmasiKehadiranRuangan($id)
+    {
+        return $this->pemilihanRuanganService->konfirmasiKehadiranRuangan($id);
+    }
+
+    public function batalkanPemilihanRuangan($id)
+    {
+        return $this->pemilihanRuanganService->batalkanPemilihanRuangan($id);
+    }
+
     public function addPemilihanRungan(Request $request)
     {
         return $this->pemilihanRuanganService->addPemilihanRungan($request);
