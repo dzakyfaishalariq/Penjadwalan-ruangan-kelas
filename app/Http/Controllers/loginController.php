@@ -27,4 +27,12 @@ class loginController extends Controller
 
         return $response;
     }
+
+    public function loginAdmin(Request $request)
+    {
+        // memanggil fungsi login_admin pada class loginService
+        $response = $this->loginService->login_admin($request);
+
+        return $response;
+    }
 }

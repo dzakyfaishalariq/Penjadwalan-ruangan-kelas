@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\adminController;
 use App\Http\Controllers\dosenController;
 use App\Http\Controllers\fakultasController;
 use App\Http\Controllers\jadwalMatakuliahController;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 // Router LOGIN
 Route::middleware('api')->post('/mahasiswa_login', [loginController::class, 'loginMahasiswa']);
 Route::middleware('api')->post('/dosen_login', [loginController::class, 'loginDosen']);
+Route::middleware('api')->post('/admin_login', [loginController::class, 'loginAdmin']);
 // hak akses mahasiswa
 Route::middleware('authMahasiswa.api')->group(function () {
     // akses prodi
@@ -87,6 +89,10 @@ Route::middleware('authDosen.api')->group(function () {
     Route::middleware('api')->get('/dosen_akses_matkul_tersedia', [jadwalMatakuliahController::class, 'getJadwalMatakuliahTersedia']);
     // akses jadwal matakuliah
     Route::middleware('api')->get('/dosen_akses_jadwal/{paginate}', [jadwalMatakuliahController::class, 'getJadwalMatakuliah']);
+    // hapus jadwal matakuliah
+    Route::middleware('api')->delete('/dosen_akses_jadwal/delete/{id}', [jadwalMatakuliahController::class, 'deleteJadwalMatakuliah']);
+    // edit jadwal matakuliah
+    Route::middleware('api')->put('/dosen_akses_jadwal/update/{id}', [jadwalMatakuliahController::class, 'updateJadwalMatakuliah']);
     // memboking ruangan
     Route::middleware('api')->post('/pemilihan_ruangan_dosen_akses/booking', [pemilihanRuangaController::class, 'addPemilihanRungan']);
     // akses ruangan berdasarkan id
@@ -102,6 +108,14 @@ Route::middleware('authDosen.api')->group(function () {
     // tambha jadwal matakuliah
     Route::middleware('api')->post('/dosen_akses_jadwal/add', [jadwalMatakuliahController::class, 'createJadwalMatakuliah']);
 });
+// hak akses admin
+Route::middleware('authAdmin.api')->group(function () {
+
+});
+
+// Router admin
+Route::middleware('api')->get('/admin-verify', [adminController::class, 'verifyAdmin']);
+Route::middleware('api')->post('/add-admin', [adminController::class, 'addAdmin']);
 
 // ROUTER FAKULTAS
 // rute untuk memanggil semua data fakultas

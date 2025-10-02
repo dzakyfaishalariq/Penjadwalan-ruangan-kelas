@@ -21,6 +21,7 @@ class jadwalMatakuliahSevice
                 'tm.nama_matakuliah',
                 'tm.sks',
                 'tm.kodemk',
+                'td.id as dosen_id',
                 'td.nama as nama_dosen',
                 'td.nip as nip_dosen',
                 'td.email as email_dosen',

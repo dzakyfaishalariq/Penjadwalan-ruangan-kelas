@@ -155,16 +155,90 @@ class loginService
                 'message' => 'Login berhasil',
                 'data'    => [
                     'user'           => [
-                        'id'          => $user->id,
-                        'id_prodi'    => $user->prodi_id,
-                        'id_pemilih'  => $user->pemilih_id,
-                        'nama'        => $user->nama,
-                        'nip'         => $user->nip,
-                        'email'       => $user->email,
-                        'username'    => $user->username,
-                        'role'        => $user->role,
+                        'id'         => $user->id,
+                        'id_prodi'   => $user->prodi_id,
+                        'id_pemilih' => $user->pemilih_id,
+                        'nama'       => $user->nama,
+                        'nip'        => $user->nip,
+                        'email'      => $user->email,
+                        'username'   => $user->username,
+                        'role'       => $user->role,
                     ],
                     'api_key'        => $api_key,
+                    'token_api_type' => 'Bearer',
+                ],
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                "line"    => $e->getLine(),
+                "file"    => $e->getFile(),
+                // "trace"   => $e->getTraceAsString(),
+                "code"    => $e->getCode(),
+            ], 422);
+        }
+    }
+    public function login_admin($request)
+    {
+        try {
+            // cek validasi login email dan password
+            $credentials = $request->validate([
+                'email'    => 'required|email',
+                'password' => 'required|string',
+            ]);
+            // ambil data admin
+            $user = DB::table('users')
+                ->select(
+                    'users.id as id',
+                    'users.name as name',
+                    'users.email as email',
+                    'users.email_verified_at as email_verified_at',
+                    'users.password as password',
+                    'users.remember_token as token',
+                    'users.created_at as created_at',
+                    'users.updated_at as updated_at',
+                    'users.role as role',
+                )
+                ->where('email', $credentials['email'])
+                ->first();
+            // lakukan pengecekan login
+            if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email atau password salah',
+                ], 401);
+            }
+            // cek apakah email sudah diverifikasi
+            if (! $user->email_verified_at) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email belum diverifikasi',
+                ], 401);
+            }
+            // buat remember token baru
+            $token = Str::random(60);
+            DB::beginTransaction();
+            // update remember token data admin
+            DB::table('users')
+                ->where('id', $user->id)
+                ->update([
+                    'remember_token' => $token,
+                ]);
+            DB::commit();
+            // memberikan response json dari berhasilnya login
+            return response()->json([
+                'success' => true,
+                'message' => 'Login berhasil',
+                'data'    => [
+                    'user'           => [
+                        'id'    => $user->id,
+                        'name'  => $user->name,
+                        'email' => $user->email,
+                        'role'  => $user->role,
+
+                    ],
+                    'api_key'        => $token,
                     'token_api_type' => 'Bearer',
                 ],
             ], 200);

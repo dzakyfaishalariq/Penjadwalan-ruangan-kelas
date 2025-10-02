@@ -31,7 +31,7 @@ class jadwalMatakuliahController extends Controller
 
     public function updateJadwalMatakuliah(Request $request, $id)
     {
-        $jadwalMatakuliah = $this->jadwalMatakuliahService->updateJadwalMatakuliah($request, $id);
+        $jadwalMatakuliah = $this->jadwalMatakuliahService->updateJadwalMatakuliah($request, (int) $id);
         return $jadwalMatakuliah;
     }
 
