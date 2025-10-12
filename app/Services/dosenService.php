@@ -11,14 +11,21 @@ use Illuminate\Support\Str;
 
 class dosenService
 {
-    public function getDosen(int $paginate = 10)
+    public function getDosen(int $paginate = 10, $request)
     {
         // lakukan pengecekan apakah nilai pagination negatif atau tidak
         $paginate = $paginate > 0 ? $paginate : 10;
+        // inisialisasi serch dari request
+        $serch = $request->input('serch', '');
         try {
             // mengambil semua data dosen dengan relasi pada table prodi
-            $data_dosen = DB::table('tb_dosen')
-                ->join("tb_prodi", "tb_dosen.prodi_id", "=", "tb_prodi.id")
+            $data_dosen = DB::table('tb_dosen');
+            // cari nama dan nip
+            if ($serch != '') {
+                $data_dosen = $data_dosen->where('tb_dosen.nama', 'like', '%' . $serch . '%')
+                    ->orWhere('tb_dosen.nip', 'like', '%' . $serch . '%');
+            }
+            $data_dosen = $data_dosen->join("tb_prodi", "tb_dosen.prodi_id", "=", "tb_prodi.id")
                 ->join("tb_pemilihan", "tb_dosen.pemilih_id", "=", "tb_pemilihan.id")
                 ->select(
                     'tb_dosen.id as dosen_id',
@@ -32,6 +39,7 @@ class dosenService
                     'tb_dosen.nama as dosen',
                     'tb_dosen.nip as nip',
                     'tb_dosen.email as email',
+                    'tb_dosen.username as username',
                     'tb_dosen.password as password',
                     'tb_dosen.api_key as api_key',
                 )->paginate($paginate);

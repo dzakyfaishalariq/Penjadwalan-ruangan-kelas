@@ -47,6 +47,12 @@ class jadwalMatakuliahController extends Controller
         return $jadwalMatakuliah;
     }
 
+    public function getMatakuliahTersedia()
+    {
+        $jadwalMatakuliah = $this->jadwalMatakuliahService->getMatakuliahTersedia();
+        return $jadwalMatakuliah;
+    }
+
     public function getJadwalMatakuliahTersedia()
     {
         $jadwalMatakuliah = $this->jadwalMatakuliahService->getJadwalMatakuliahTersedia();

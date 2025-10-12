@@ -22,6 +22,11 @@ class pemilihanRuangaController extends Controller
         return $this->pemilihanRuanganService->getPemilihanRuanganSemua();
     }
 
+    public function TotalPemilihanRuanganByTanggalHariIni()
+    {
+        return $this->pemilihanRuanganService->TotalPemilihanRuanganByTanggalHariIni();
+    }
+
     public function getPemilihanRuanganByPemilih($pemilih_id, $paginate)
     {
         return $this->pemilihanRuanganService->getPemilihanRuanganByPemilih($pemilih_id, $paginate);

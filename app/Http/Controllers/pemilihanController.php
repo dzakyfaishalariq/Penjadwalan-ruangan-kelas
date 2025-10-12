@@ -13,10 +13,17 @@ class pemilihanController extends Controller
         // memanggil class pemilihanService dan disimpan di variabel pemilihanService sebagai atribut
         $this->pemilihanService = $pemilihanService;
     }
-    public function getPemilihan($paginate)
+    public function getPemilihan($paginate, Request $request)
     {
         // memanggil fungsi getPemilihan dari pemilihanService
-        $pemilihan = $this->pemilihanService->getPemilihan($paginate);
+        $pemilihan = $this->pemilihanService->getPemilihan($paginate, $request);
+
+        return $pemilihan;
+    }
+    public function totalPemilihan()
+    {
+        // memanggil fungsi totalPemilihan dari pemilihanService
+        $pemilihan = $this->pemilihanService->totalPemilihan();
 
         return $pemilihan;
     }

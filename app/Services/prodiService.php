@@ -10,15 +10,30 @@ use Illuminate\Support\Facades\DB;
  */
 class prodiService
 {
-    public function getProdi(int $paginate = 10)
+    public function getProdi($request, int $paginate = 10)
     {
         // lakukan pengecekan apakah nilai pagination negatif atau tidak
         $paginate = $paginate > 0 ? $paginate : 10;
+        // insisialisasi pencarian
+        $serch = $request->input('serch', '');
         try {
             // ubah variabel paginate ke integer
             $paginate = (int) $paginate;
             // fungsi memanggil semua data prodi
-            $data = DB::table('tb_prodi')->paginate($paginate);
+            $data = DB::table('tb_prodi as tp');
+            // lakukan pencarian data
+            if ($serch != '') {
+                $data = $data->where('tp.nama_prodi', 'like', '%' . $serch . '%');
+            }
+            $data = $data->join('tb_fakultas as tf', 'tp.fakultas_id', '=', 'tf.id')
+                ->select(
+                    'tp.id',
+                    'tp.nama_prodi',
+                    'tf.id as fakultas_id',
+                    'tf.nama_fakultas'
+                )
+                ->orderBy('tp.id', 'desc')
+                ->paginate($paginate);
             // mengembalikan response json
             $respons = new Template(true, 'Data Berhasil di ambil', $data);
             return $respons->response();

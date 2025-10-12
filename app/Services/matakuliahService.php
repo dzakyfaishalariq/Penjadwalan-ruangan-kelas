@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\DB;
 class matakuliahService
 {
     // fungsi untuk memanggil semua data matakuliah
-    public function getMatkul(int $paginate = 10)
+    public function getMatkul($request, int $paginate = 10)
     {
         // validasi nilai paginate harus lebih dari 0
         $paginate = $paginate > 0 ? $paginate : 10;
+        // inisialisasi pencarian
+        $serch = $request->input('serch', '');
         // batasi paginate di range 100
         $paginate = max(1, (min($paginate, 100)));
         try {
@@ -22,15 +24,21 @@ class matakuliahService
             }
             // inisialisasi select data
             $select_data = [
+                "tm.id",
                 "tm.prodi_id",
+                "tm.kodemk",
                 "tp.nama_prodi",
                 "tm.id as matakuliah_id",
                 "tm.nama_matakuliah",
                 "tm.sks",
             ];
             // memanggil semua data matakuliah
-            $data_matakuliah = DB::table('tb_matakuliah as tm')
-                ->join('tb_prodi as tp', 'tm.prodi_id', '=', 'tp.id')
+            $data_matakuliah = DB::table('tb_matakuliah as tm');
+            // lakukan pencarian data
+            if ($serch != '') {
+                $data_matakuliah = $data_matakuliah->where('tm.nama_matakuliah', 'like', '%' . $serch . '%');
+            }
+            $data_matakuliah = $data_matakuliah->join('tb_prodi as tp', 'tm.prodi_id', '=', 'tp.id')
                 ->select($select_data)
                 ->orderBy('matakuliah_id', 'desc')
                 ->paginate($paginate);
@@ -86,6 +94,7 @@ class matakuliahService
                 'prodi_id'        => 'required|integer',
                 'nama_matakuliah' => 'required|string|max:255',
                 'sks'             => 'required|integer',
+                'kodemk'          => 'required|string|max:255',
             ]);
             // lakukan pengecekan apakah data valid
             if ($kondisi) {
@@ -124,6 +133,7 @@ class matakuliahService
                 "prodi_id"        => "required|integer",
                 "nama_matakuliah" => "required|string|max:255",
                 "sks"             => "required|integer",
+                "kodemk"          => "required|string|max:255",
             ]);
             // lakukan pengecekan apakah data valid
             if ($kondisi) {

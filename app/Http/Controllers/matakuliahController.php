@@ -12,9 +12,9 @@ class matakuliahController extends Controller
         $this->matakuliahService = $matakuliahService;
     }
 
-    public function getMatkul($paginate)
+    public function getMatkul(Request $request, $paginate)
     {
-        $matakuliah = $this->matakuliahService->getMatkul($paginate);
+        $matakuliah = $this->matakuliahService->getMatkul($request, $paginate);
         return $matakuliah;
     }
 

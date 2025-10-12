@@ -50,8 +50,10 @@ Route::middleware('authMahasiswa.api')->group(function () {
     Route::middleware('api')->get('/mahasiswa_akses_nama_ruangan', [ruaganController::class, 'getNamaRuangan']);
     // akses jadwal matakuliah
     Route::middleware('api')->get('/mahasiswa_akses_jadwal/{paginate}', [jadwalMatakuliahController::class, 'getJadwalMatakuliah']);
+    // akses matakuliah tersedia
+    Route::middleware('api')->get('/mahasiswa_akses_matkul_tersedia', [jadwalMatakuliahController::class, 'getMatakuliahTersedia']);
     // akses jadwal matakuliah tersedia
-    Route::middleware('api')->get('/mahasiswa_akses_matkul_tersedia', [jadwalMatakuliahController::class, 'getJadwalMatakuliahTersedia']);
+    Route::middleware('api')->get('/mahasiswa_akses_jadwal_tersedia', [jadwalMatakuliahController::class, 'getJadwalMatakuliahTersedia']);
     // akses jadwal matakuliah berdasarkan id
     Route::middleware('api')->get('/mahasiswa_akses_jadwal_by_id/{id}', [jadwalMatakuliahController::class, 'getJadwalMatakuliahById']);
 
@@ -85,8 +87,10 @@ Route::middleware('authDosen.api')->group(function () {
     Route::middleware('api')->get('/dosen_akses_total/ruangan_terpakai', [ruaganController::class, 'totalRuanganTerpakai']);
     // akses nama ruangan
     Route::middleware('api')->get('/dosen_akses_nama_ruangan', [ruaganController::class, 'getNamaRuangan']);
+    // akses matakuliah tersedia
+    Route::middleware('api')->get('/dosen_akses_matkul_tersedia', [jadwalMatakuliahController::class, 'getMatakuliahTersedia']);
     // akses jadwal matakuliah tersedia
-    Route::middleware('api')->get('/dosen_akses_matkul_tersedia', [jadwalMatakuliahController::class, 'getJadwalMatakuliahTersedia']);
+    Route::middleware('api')->get('/dosen_akses_jadwal_tersedia', [jadwalMatakuliahController::class, 'getJadwalMatakuliahTersedia']);
     // akses jadwal matakuliah
     Route::middleware('api')->get('/dosen_akses_jadwal/{paginate}', [jadwalMatakuliahController::class, 'getJadwalMatakuliah']);
     // hapus jadwal matakuliah
@@ -110,7 +114,74 @@ Route::middleware('authDosen.api')->group(function () {
 });
 // hak akses admin
 Route::middleware('authAdmin.api')->group(function () {
-
+    // total ruangan semuanya
+    Route::middleware('api')->get('/admin_akses_total_semua_ruangan', [ruaganController::class, 'totalRuangan']);
+    // total ruangan terpakai
+    Route::middleware('api')->get('/admin_akses_total_ruangan_terpakai', [ruaganController::class, 'totalRuanganTerpakai']);
+    // total penggunan ruangan
+    Route::middleware('api')->get('/admin_akses_total_penggunaan_ruangan', [pemilihanController::class, 'totalPemilihan']);
+    // total booking hari ini
+    Route::middleware('api')->get('/admin_akses_total_booking_hari_ini', [pemilihanRuangaController::class, 'TotalPemilihanRuanganByTanggalHariIni']);
+    // ambil semua data ruangan
+    Route::middleware('api')->get('/admin_akses_semua_ruangan/{paginate}', [ruaganController::class, 'getRuangan']);
+    // ambil data penggunan aplikasi
+    Route::middleware('api')->get('/admin_akses_penggunaan_aplikasi/{paginate}', [pemilihanController::class, 'getPemilihan']);
+    // ambil total ruangan yang tersedia
+    Route::middleware('api')->get('/admin_akses_total_ruangan_tersedia', [ruaganController::class, 'totalRuanganTersedia']);
+    // ambil total kapasitas semua ruangan
+    Route::middleware('api')->get('/admin_akses_total_kapasitas_ruangan', [ruaganController::class, 'totalSemuaKapasitasRuangan']);
+    // ambil data pengguna mahasiswa
+    Route::middleware('api')->get('/admin_akses_pengguna_mahasiswa/{paginate}', [mahassiwaController::class, 'getMahasiswa']);
+    // ambil data pengguna dosen
+    Route::middleware('api')->get('/admin_akses_pengguna_dosen/{paginate}', [dosenController::class, 'getDosen']);
+    // ambil total data fakultas
+    Route::middleware('api')->get('/admin_akses_total_fakultas', [fakultasController::class, 'jumlahFakultas']);
+    // ambil total data prodi
+    Route::middleware('api')->get('/admin_akses_total_prodi', [prodiController::class, 'totalProdi']);
+    // ambil total data matakuliah
+    Route::middleware('api')->get('/admin_akses_total_matakuliah', [matakuliahController::class, 'totalMatkul']);
+    // ambil data fakultas
+    Route::middleware('api')->get('/admin_akses_fakultas/{paginate}', [fakultasController::class, 'getFakultasAndProdi']);
+    // ambil data prodi
+    Route::middleware('api')->get('/admin_akses_prodi/{paginate}', [prodiController::class, 'getProdi']);
+    // ambil data matakuliah
+    Route::middleware('api')->get('/admin_akses_matakuliah/{paginate}', [matakuliahController::class, 'getMatkul']);
+    //  tambah data fakultas
+    Route::middleware('api')->post('/admin_akses_fakultas/add', [fakultasController::class, 'createFakultas']);
+    // edit fakultas
+    Route::middleware('api')->put('/admin_akses_fakultas/update/{id}', [fakultasController::class, 'updateFakultas']);
+    // hapus fakultas
+    Route::middleware('api')->delete('/admin_akses_fakultas/delete/{id}', [fakultasController::class, 'deleteFakultas']);
+    // ambil semua data fakultas
+    Route::middleware('api')->get('/admin_akses_semua_fakultas', [fakultasController::class, 'getAllFakultas']);
+    // tambah data prodi
+    Route::middleware('api')->post('/admin_akses_prodi/add', [prodiController::class, 'createProdi']);
+    // edit prodi
+    Route::middleware('api')->put('/admin_akses_prodi/update/{id}', [prodiController::class, 'updateProdi']);
+    // hapus prodi
+    Route::middleware('api')->delete('/admin_akses_prodi/delete/{id}', [prodiController::class, 'deleteProdi']);
+    // akses semua prodi
+    Route::middleware('api')->get('/admin_akses_semua_prodi', [prodiController::class, 'getProdiAll']);
+    // edit matakuliah
+    Route::middleware('api')->put('/admin_akses_matakuliah/update/{id}', [matakuliahController::class, 'updateMatkul']);
+    // hapus matakuliah
+    Route::middleware('api')->delete('/admin_akses_matakuliah/delete/{id}', [matakuliahController::class, 'deleteMatkul']);
+    // tambah matakuliah
+    Route::middleware('api')->post('/admin_akses_matakuliah/add', [matakuliahController::class, 'addMatkul']);
+    // tambah ruangan
+    Route::middleware('api')->post('/admin_akses_ruangan/add', [ruaganController::class, 'createRuangan']);
+    // edit ruangan
+    Route::middleware('api')->put('/admin_akses_ruangan/update/{id}', [ruaganController::class, 'updateRuangan']);
+    // hapus ruangan
+    Route::middleware('api')->delete('/admin_akses_ruangan/delete/{id}', [ruaganController::class, 'deleteRuangan']);
+    // edit data mahasiswa
+    Route::middleware('api')->put('/admin_akses_pengguna_mahasiswa/update/{id}', [mahassiwaController::class, 'updateMahasiswa']);
+    // delet data mahasiswa
+    Route::middleware('api')->delete('/admin_akses_pengguna_mahasiswa/delete/{id}', [mahassiwaController::class, 'deleteMahasiswa']);
+    // edit data dosen
+    Route::middleware('api')->put('/admin_akses_pengguna_dosen/update/{id}', [dosenController::class, 'updateDosen']);
+    // hapus data dosen
+    Route::middleware('api')->delete('/admin_akses_pengguna_dosen/delete/{id}', [dosenController::class, 'deleteDosen']);
 });
 
 // Router admin

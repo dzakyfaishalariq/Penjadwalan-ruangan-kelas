@@ -14,10 +14,10 @@ class mahassiwaController extends Controller
         $this->mahasiswaService = $mahasiswaService;
     }
 
-    public function getMahasiswa($paginate)
+    public function getMahasiswa($paginate, Request $request)
     {
         // memanggil fungsi getMahasiswa untuk menampilkan semua data mahasiswa pada class mahasiswaService
-        $respons = $this->mahasiswaService->getMahasiswa($paginate);
+        $respons = $this->mahasiswaService->getMahasiswa($paginate, $request);
 
         return $respons;
     }

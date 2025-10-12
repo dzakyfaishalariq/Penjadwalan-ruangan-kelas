@@ -12,11 +12,11 @@ class dosenController extends Controller
     {
         $this->dosenService = $dosenService;
     }
-    public function getDosen($paginate)
+    public function getDosen($paginate, Request $request)
     {
         // memanggil fungsi getDosen untuk menampilkan semua data dosen pada class dosenService
 
-        $respons = $this->dosenService->getDosen($paginate);
+        $respons = $this->dosenService->getDosen($paginate, $request);
 
         return $respons;
     }

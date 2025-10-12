@@ -45,6 +45,42 @@ class jadwalMatakuliahSevice
             return $response->response();
         }
     }
+    public function getMatakuliahTersedia()
+    {
+        try {
+            // $select_data = [
+            //     'tjm.id',
+            //     'tm.nama_matakuliah',
+            //     'tm.sks',
+            //     'tm.kodemk',
+            //     'td.nama as nama_dosen',
+            //     'tjm.hari',
+            //     'tjm.jam_mulai',
+            //     'tjm.jam_selesai',
+            // ];
+            // $data_jadwal_matakuliah = DB::table('tb_jadwal_matakuliah as tjm')
+            //     ->join('tb_matakuliah as tm', 'tjm.matakuliah_id', '=', 'tm.id')
+            //     ->join('tb_dosen as td', 'tjm.dosen_id', '=', 'td.id')
+            //     ->select($select_data)
+            //     ->get();
+            // $response = new Template(true, 'Data Berhasil di ambil', $data_jadwal_matakuliah);
+            // return $response->response();
+            $data_matakuliah = DB::table('tb_matakuliah')->select(
+                [
+                    'tb_matakuliah.id',
+                    'tb_matakuliah.nama_matakuliah',
+                    'tb_matakuliah.sks',
+                    'tb_matakuliah.kodemk',
+                ]
+            )->get();
+            $response = new Template(true, 'Data Berhasil di ambil', $data_matakuliah);
+            return $response->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $response = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $response->response();
+        }
+    }
     public function getJadwalMatakuliahTersedia()
     {
         try {

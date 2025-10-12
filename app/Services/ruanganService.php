@@ -39,33 +39,39 @@ class ruanganService
 
             // Kondisi pencarian jika ada
             if (! empty($search)) {
-                $data_ruangan->where(function ($q) use ($search) {
-                    // Pencarian berdasarkan nama ruangan (case-insensitive)
-                    $q->where('tr.nama_ruangan', 'LIKE', '%' . $search . '%');
+                if ($search === "tersedia") {
+                    $data_ruangan = $data_ruangan->where('tr.status', 1);
+                } else if ($search === "dipakai") {
+                    $data_ruangan = $data_ruangan->where('tr.status', 0);
+                } else {
+                    $data_ruangan->where(function ($q) use ($search) {
+                        // Pencarian berdasarkan nama ruangan (case-insensitive)
+                        $q->where('tr.nama_ruangan', 'LIKE', '%' . $search . '%');
 
-                    // Pencarian berdasarkan lantai (jika search adalah angka)
-                    if (is_numeric($search)) {
-                        $q->orWhere('tr.lantai', '=', (int) $search);
-                    }
-
-                    // Pencarian singkatan (huruf pertama setiap kata)
-                    $words = array_filter(explode(' ', $search));
-                    if (count($words) > 0) {
-                        $pattern = '';
-                        foreach ($words as $word) {
-                            if (! empty(trim($word))) {
-                                $pattern .= substr(trim($word), 0, 1) . '%';
-                            }
+                        // Pencarian berdasarkan lantai (jika search adalah angka)
+                        if (is_numeric($search)) {
+                            $q->orWhere('tr.lantai', '=', (int) $search);
                         }
-                        $q->orWhere('tr.nama_ruangan', 'LIKE', $pattern);
-                    }
 
-                    // Pencarian kombinasi: "lantai 1" atau "ruang 2"
-                    if (preg_match('/(lantai|ruang|lt|floor|l)\s*(\d+)/i', $search, $matches)) {
-                        $q->orWhere('tr.lantai', '=', (int) $matches[2]);
-                    }
+                        // Pencarian singkatan (huruf pertama setiap kata)
+                        $words = array_filter(explode(' ', $search));
+                        if (count($words) > 0) {
+                            $pattern = '';
+                            foreach ($words as $word) {
+                                if (! empty(trim($word))) {
+                                    $pattern .= substr(trim($word), 0, 1) . '%';
+                                }
+                            }
+                            $q->orWhere('tr.nama_ruangan', 'LIKE', $pattern);
+                        }
 
-                });
+                        // Pencarian kombinasi: "lantai 1" atau "ruang 2"
+                        if (preg_match('/(lantai|ruang|lt|floor|l)\s*(\d+)/i', $search, $matches)) {
+                            $q->orWhere('tr.lantai', '=', (int) $matches[2]);
+                        }
+
+                    });
+                }
             }
 
             $data_ruangan = $data_ruangan->orderBy('ruangan_id', 'desc')
@@ -146,6 +152,7 @@ class ruanganService
                 'nama_ruangan' => 'required|string|max:255',
                 'kapasitas'    => 'required|integer',
                 'status'       => 'required|boolean',
+                'lantai'       => 'required|integer',
             ]);
             if ($kondisi) {
                 DB::beginTransaction();
@@ -177,6 +184,7 @@ class ruanganService
                 'nama_ruangan' => 'required|string|max:255',
                 'kapasitas'    => 'required|integer',
                 'status'       => 'required|boolean',
+                'lantai'       => 'required|integer',
             ]);
             if ($kondisi) {
                 DB::beginTransaction();
@@ -255,6 +263,33 @@ class ruanganService
         try {
             $data = DB::table('tb_ruangan')
                 ->where('status', 0)->count();
+            $respons = new Template(true, 'Total Berhasil di ambil', $data);
+            return $respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
+
+    public function totalRuanganTersedia()
+    {
+        try {
+            $data = DB::table('tb_ruangan')
+                ->where('status', 1)->count();
+            $respons = new Template(true, 'Total Berhasil di ambil', $data);
+            return $respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
+
+    public function totalSemuaKapasitasRuangan()
+    {
+        try {
+            $data    = DB::table('tb_ruangan')->sum('kapasitas');
             $respons = new Template(true, 'Total Berhasil di ambil', $data);
             return $respons->response();
         } catch (Exception $e) {

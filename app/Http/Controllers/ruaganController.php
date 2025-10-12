@@ -36,7 +36,6 @@ class ruaganController extends Controller
         $ruangan = $this->ruanganService->deleteRuangan($id);
         return $ruangan;
     }
-
     public function totalRuangan()
     {
         $ruangan = $this->ruanganService->totalRuangan();
@@ -46,6 +45,18 @@ class ruaganController extends Controller
     public function totalRuanganTerpakai()
     {
         $ruangan = $this->ruanganService->totalRuanganTerpakai();
+        return $ruangan;
+    }
+
+    public function totalRuanganTersedia()
+    {
+        $ruangan = $this->ruanganService->totalRuanganTersedia();
+        return $ruangan;
+    }
+
+    public function totalSemuaKapasitasRuangan()
+    {
+        $ruangan = $this->ruanganService->totalSemuaKapasitasRuangan();
         return $ruangan;
     }
 

@@ -11,14 +11,22 @@ use Illuminate\Support\Str;
 
 class mahasiswaService
 {
-    public function getMahasiswa(int $paginate = 10)
+    public function getMahasiswa(int $paginate = 10, $request)
     {
         // mengecek apakah $paginate bernilai lebih dari 0
         $paginate = $paginate > 0 ? $paginate : 10;
+        // inisialisasi pencarian
+        $search = $request->input('search', '');
         // mengambil semua data mahasiswa
         try {
-            $data_mahasiswa = DB::table('tb_mahasiswa')
-                ->join('tb_prodi', 'tb_mahasiswa.prodi_id', '=', 'tb_prodi.id')
+            $data_mahasiswa = DB::table('tb_mahasiswa');
+
+            //cari nama dan nim mahasiswa
+            if ($search) {
+                $data_mahasiswa = $data_mahasiswa->where('tb_mahasiswa.nama', 'like', '%' . $search . '%')
+                    ->orWhere('tb_mahasiswa.nim', 'like', '%' . $search . '%');
+            }
+            $data_mahasiswa = $data_mahasiswa->join('tb_prodi', 'tb_mahasiswa.prodi_id', '=', 'tb_prodi.id')
                 ->join('tb_pemilihan', 'tb_mahasiswa.pemilih_id', '=', 'tb_pemilihan.id')
                 ->select(
                     'tb_prodi.id as prodi_id',

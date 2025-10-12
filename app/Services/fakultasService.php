@@ -9,17 +9,66 @@ use Illuminate\Validation\ValidationException;
 class fakultasService
 {
     // mengatur logic dari fakultas controller agar tidak terbebani dengan pemanggilan logika yang berhubungan dengan database secara langsung.
-    public function getFakultas(int $paginate = 10)
+    public function getFakultas(int $paginate = 10, $request)
     {
         // lakukan pengecekan apakah nilai pagination negatif atau tidak
         $paginate = $paginate > 0 ? $paginate : 10;
+        // inisialisasi serch dari request
+        $serch = $request->input('serch', '');
         // ubah variabel paginate ke integer
         try {
             $paginate = (int) $paginate;
             // memanggil data fakultas denga paginate 5
-            $data_get_fakultas = DB::table('tb_fakultas')->paginate($paginate);
+            $data_get_fakultas = DB::table('tb_fakultas as tf');
+            // cari nama fakultas
+            if ($serch != '') {
+                $data_get_fakultas = $data_get_fakultas->where('tf.nama_fakultas', 'like', '%' . $serch . '%');
+            }
+            $data_get_fakultas = $data_get_fakultas->orderBy('tf.id', 'desc')->paginate($paginate);
             // mengembalikan response json
             $template_respons = new Template(true, 'Data Berhasil di ambil', $data_get_fakultas);
+            return $template_respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $template_respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $template_respons->response();
+        }
+    }
+    public function getAllFakultas()
+    {
+        try {
+            $data_get_fakultas = DB::table('tb_fakultas')->get();
+            // mengembalikan response json
+            $template_respons = new Template(true, 'Data Berhasil di ambil', $data_get_fakultas);
+            return $template_respons->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $template_respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $template_respons->response();
+        }
+    }
+    public function getFakultasAndProdi(int $paginate = 10, $request)
+    {
+        // lakukan pengecekan apakah nilai pagination negatif atau tidak
+        $paginate = $paginate > 0 ? $paginate : 10;
+        // inisialisasi serch dari request
+        $serch = $request->input('serch', '');
+        try {
+            $data_get_fakultas_and_prodi = DB::table('tb_fakultas as tf');
+            // cari nama fakultas
+            if ($serch != '') {
+                $data_get_fakultas_and_prodi = $data_get_fakultas_and_prodi->where('tf.nama_fakultas', 'like', '%' . $serch . '%');
+            }
+            $data_get_fakultas_and_prodi = $data_get_fakultas_and_prodi->leftJoin('tb_prodi as tp', 'tf.id', '=', 'tp.fakultas_id')
+                ->select(
+                    'tf.id',
+                    'tf.nama_fakultas as fakultas',
+                    DB::raw('COUNT(tp.id) as jumlah_prodi')
+                )
+                ->groupBy('tf.id', 'tf.nama_fakultas')
+                ->orderBy('tf.id', 'desc')
+                ->paginate($paginate);
+            $template_respons = new Template(true, 'Data Berhasil di ambil', $data_get_fakultas_and_prodi);
             return $template_respons->response();
         } catch (Exception $e) {
             // mengembalikan response json apabila terjadi error

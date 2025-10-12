@@ -26,7 +26,7 @@ class AuthenticateAdminAPI
         }
 
         // ambil data user berdasarkan token
-        $userAdmin = DB::table('user')->where('remember_token', $token)->first();
+        $userAdmin = DB::table('users')->where('remember_token', $token)->first();
         // jika token tidak valid
         if (! $userAdmin) {
             return response()->json([

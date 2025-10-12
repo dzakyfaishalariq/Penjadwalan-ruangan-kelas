@@ -94,6 +94,21 @@ class pemilihanRuanganService
             return $response->response();
         }
     }
+    public function TotalPemilihanRuanganByTanggalHariIni()
+    {
+        try {
+            //code...
+            $data = DB::table('tb_pemilihan_ruangan')
+                ->where('tanggal_pemilihan', date('Y-m-d'))
+                ->count();
+            $response = new Template(true, 'Data Berhasil di ambil', $data);
+            return $response->response();
+        } catch (Exception $e) {
+            // mengembalikan response json apabila terjadi error
+            $response = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $response->response();
+        }
+    }
     public function getPemilihanRuanganByPemilih(int $pemilih_id, int $paginate = 3)
     {
         try {

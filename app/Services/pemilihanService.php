@@ -7,15 +7,37 @@ use Illuminate\Support\Facades\DB;
 
 class pemilihanService
 {
-    public function getPemilihan(int $paginate = 10)
+    public function getPemilihan(int $paginate = 10, $request)
     {
         // cek apakah variabel paginate bernilai lebih dari 0
         $paginate = $paginate > 0 ? $paginate : 10;
         try {
+            $search = $request->input('search', '');
             // mengambil data tabel pemilihan dan menampilkan nya dengan batasan paginate
-            $data_pemiliha = DB::table('tb_pemilihan')
-                ->paginate($paginate);
-            $respons = new Template(true, 'Data Berhasil di ambil', $data_pemiliha);
+            $data_pemiliha = DB::table('tb_pemilihan');
+            // pencarian
+            if ($search != '') {
+                if ($search == 'Mahasiswa') {
+                    $data_pemiliha = $data_pemiliha->where('tb_pemilihan.tipe', 'like', '%' . $search . '%');
+                } else if ($search == 'Dosen') {
+                    $data_pemiliha = $data_pemiliha->where('tb_pemilihan.tipe', 'like', '%' . $search . '%');
+                } else {
+                    $data_pemiliha = $data_pemiliha->where('tb_pemilihan.nama', 'like', '%' . $search . '%');
+                }
+            }
+            $data_pemiliha = $data_pemiliha->paginate($paginate);
+            $respons       = new Template(true, 'Data Berhasil di ambil', $data_pemiliha);
+            return $respons->response();
+        } catch (Exception $e) {
+            $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());
+            return $respons->response();
+        }
+    }
+    public function totalPemilihan()
+    {
+        try {
+            $data    = DB::table('tb_pemilihan')->count();
+            $respons = new Template(true, 'Total Berhasil di ambil', $data);
             return $respons->response();
         } catch (Exception $e) {
             $respons = new Template(false, 'Data Gagal di ambil', $e->getMessage());

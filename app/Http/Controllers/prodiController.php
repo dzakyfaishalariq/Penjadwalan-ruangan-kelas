@@ -15,10 +15,10 @@ class prodiController extends Controller
         $this->prodiService = $prodiService;
     }
 
-    public function getProdi($paginate)
+    public function getProdi(Request $request, $paginate)
     {
         // memanggil semua data prodi
-        $prodi = $this->prodiService->getProdi($paginate);
+        $prodi = $this->prodiService->getProdi($request, $paginate);
 
         return $prodi;
     }
