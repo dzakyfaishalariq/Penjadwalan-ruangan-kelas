@@ -42,7 +42,7 @@ class dosenService
                     'tb_dosen.username as username',
                     'tb_dosen.password as password',
                     'tb_dosen.api_key as api_key',
-                )->paginate($paginate);
+                )->orderBy('tb_dosen.id', 'desc')->paginate($paginate);
             // chek apakah data dosen tidak ditemukan
             if ($data_dosen == null) {
                 $respons = new Template(false, 'Data Gagal di ambil', 'Data dosen tidak ditemukan');

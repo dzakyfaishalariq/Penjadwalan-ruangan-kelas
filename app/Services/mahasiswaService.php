@@ -43,7 +43,7 @@ class mahasiswaService
                     'tb_mahasiswa.password as password_mahasiswa',
                     'tb_mahasiswa.role as role_mahasiswa',
                     'tb_mahasiswa.api_key as api_key_mahasiswa',
-                )
+                )->orderBy('tb_mahasiswa.created_at', 'desc')
                 ->paginate($paginate);
             $respons = new Template(true, 'Data Berhasil di ambil', $data_mahasiswa);
             return $respons->response();
